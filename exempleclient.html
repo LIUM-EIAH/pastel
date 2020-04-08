@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+  <meta charset="utf-8" />
+  <title>WebSocket Test</title>
+
+  <script language="javascript" type="text/javascript">
+
+  var wsUri = "ws://la-pastel.univ-lemans.fr:8000/";
+  var output;
+
+  function init()
+  {
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    writeToScreen("CONNECTED");
+	authentifie(5, "etudiant", 13, 255);
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+   var message = JSON.parse(evt.data);
+   switch (message.action) {
+   case "transcription" : 
+		transcription(message.params);
+		break;
+	case "page" :
+		page(message.params);
+		break;
+	case "ressource" :
+		ressource(message.params);
+		break;
+	case "indicator" :
+		indicator(message.params);
+		break;
+	default :
+		console.log(message);
+		break;
+   }
+    //writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+  }
+
+  function transcription(message) {
+	output = document.getElementById("transcription");
+	
+	var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message.text;
+    output.appendChild(pre);
+  }
+  
+  function page(message) {
+  output = document.getElementById("page");
+	
+	var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message.page;
+    output.appendChild(pre);
+  }
+  function ressource(message) {
+  output = document.getElementById("ressource");
+	
+	var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message.url;
+    output.appendChild(pre);
+  }
+  
+  function indicator(message) {
+	output = document.getElementById("indicator");
+	
+	var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+  
+  
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+    writeToScreen("SENT: " + message);
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+  output = document.getElementById("info");
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  var user_id;
+  var course_id;
+  var activity_id;
+  
+  function authentifie(userid, role, course, activity)
+  {
+   user_id= userid;
+   course_id = course;
+   activity_id = activity;
+   var data = {
+    "action" : "update_status",
+    "params" : { "user_id" : userid, "status" : "online", "role":role, "course":course, "activity" : activity }
+   };
+
+   doSend(JSON.stringify(data));
+  }
+
+function notifierAlerte(conteneur, obj, donnee) {
+   var data = {
+    "action" : "alerte",
+    "params" : { "user_id" : user_id, "container" : conteneur, "object":obj, "activity":activity_id, "course" : course_id, "data" : donnee }
+   };
+
+   doSend(JSON.stringify(data));
+}
+
+  window.addEventListener("load", init, false);
+//  authentifie(5, "etudiant", 13, 255);
+
+  </script>
+
+<h2>WebSocket Test</h2>
+
+
+	
+	
+
+  <div id="transcription" style="width:250px;height:200px;background-color:#66CC33;overflow-y: scroll;scroll-behavior: auto;float: left;margin-right: 10px;" >
+  Transcription<br/>
+  </div>
+  
+  <div id="page" style="width:150px;height:200px;background-color:#CC6633;overflow-y: scroll;scroll-behavior: auto;float: left;margin-right: 10px;" >
+  Chg Page<br/>
+  </div>
+  <div id="ressource" style="width:150px;height:200px;background-color:#33CC66;overflow-y: scroll;scroll-behavior: auto;float: left;margin-right: 10px;" >
+  Ressources<br/>
+  </div>
+  <div id="indicator" style="width:150px;height:200px;background-color:#666633;overflow-y: scroll;scroll-behavior: auto;float: left;margin-right: 10px;" >
+  Indicator<br/>
+  </div>
+ <div id="espace" style="height:20px;clear:both"></div>
+  <div id="info" style="width:700px;height:200px;background-color:#666633;overflow-y: scroll;scroll-behavior: auto;clear:both;margin: 20px;" >
+  Informations<br/>
+  </div>
+  <input type="button" value="alerte vitesse" onclick="javascript:notifierAlerte('div1', 'btnalerte', 'vitesse')";>
