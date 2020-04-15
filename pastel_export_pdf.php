@@ -16,7 +16,6 @@ class pastel_export_pdf {
         $this->url_subname = $cours->nomdiapo;
         // $url_diapo = "http://la-pastel.univ-lemans.fr/mod/pastel_/pix/page/".$url_subname."-page-";
 
-        
         //XXX donnee de test a supprimer
         //$this->courseID = 26;
         //$this->activityID = 300;

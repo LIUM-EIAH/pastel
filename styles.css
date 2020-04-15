@@ -1,46 +1,46 @@
 .p {
-	font-style: 0.5em;
+    font-style: 0.5em;
 }
 
 .module {
-	float:left;
-	width:28vw;
-	height: 50vh;
+    float:left;
+    width:28vw;
+    height: 50vh;
 }
 
 .fixe{
-	height: 5vh;
+    height: 5vh;
 }
 
 .clear{
-	clear:both;
+    clear:both;
 }
 
 .bigPicture{
-	width: 100%;
-	height: 200px;
+    width: 100%;
+    height: 200px;
 }
 
 .marginTop{
-	margin-top: 2em;
+    margin-top: 2em;
 }
 
 /*Ces wrappers sont utilises pour la transcription*/
 .transcriptWrapper{
-	margin-left:1em;
-	margin-right: 1em;
+    margin-left:1em;
+    margin-right: 1em;
 }
 
 .transcriptWrapper:hover{
-	background-color: #e6e6e6;
+    background-color: #e6e6e6;
 }
 
 /*Chaque paragraphe de la transcription est separe des autres*/
 .blocTranscript{
-	text-indent:-3em;
-	margin-left:3em;
-	position: relative;
-	padding-bottom: 1em;
+    text-indent:-3em;
+    margin-left:3em;
+    position: relative;
+    padding-bottom: 1em;
 }
 
 /*Dans la premiere version des fenetres etaient ouvertes sur un clic, ce qui suit est le style de ces fenetres*/
@@ -74,102 +74,102 @@
 }
 
 div#transcription {
-	background-color:#ffffff;
-	margin-left: auto;
+    background-color:#ffffff;
+    margin-left: auto;
     margin-right: auto;
     margin-top: 0px;
-	width : 90%;
-	height: 100%;
-	border-style : none;
-	border-radius: 5px;
-	box-shadow: -1px 2px 10px 3px rgba(0, 0, 0, 0.3) inset;
-	overflow-x: visible;
-	overflow-y: auto;
+    width : 90%;
+    height: 100%;
+    border-style : none;
+    border-radius: 5px;
+    box-shadow: -1px 2px 10px 3px rgba(0, 0, 0, 0.3) inset;
+    overflow-x: visible;
+    overflow-y: auto;
 }
 
 .tscrpt{
-	margin-bottom: 1vh;
-	height: 100%;
+    margin-bottom: 1vh;
+    height: 100%;
 }
 
 .zone_moitie {
-	float:left;
-	width:45vw;
-	/*height:75vh;*/
+    float:left;
+    width:45vw;
+    /*height:75vh;*/
 }
 
 .zone_elargie {
-	float:left;
-	width:38vw;
-	/*height:75vh;*/
+    float:left;
+    width:38vw;
+    /*height:75vh;*/
 }
 
 .zone_tiers {
-	float:left;
-	width:28vw;
-	/*height:75vh;*/
+    float:left;
+    width:28vw;
+    /*height:75vh;*/
 }
 
 .zone_ressources {
-	float:left;
-	width:24vw;
-	position: relative;
-	/*height:75vh;*/
+    float:left;
+    width:24vw;
+    position: relative;
+    /*height:75vh;*/
 }
 
 /*#resources_view{
-	position: absolute;
+    position: absolute;
     bottom: 1px;
 }*/
 
 .hauteur_max{
-	height: 540px;
+    height: 540px;
 }
 
 .vertically_centered{
-	display: flex;
-  	flex-direction: column;
-  	justify-content: space-around;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
 
 .horizontally_centered{
-	/*padding: 5px;*/
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
+    /*padding: 5px;*/
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 
 #alert_panel{
-	height : 5vh;
+    height : 5vh;
 }
 
 .diapo{
-	width: 26vw;
-	height: 220px;
-	border-style: solid;
-	border-width: 1px;
+    width: 26vw;
+    height: 220px;
+    border-style: solid;
+    border-width: 1px;
 }
 
 .diapo2{
-	width: 30vw;
-	height: 225px;
+    width: 30vw;
+    height: 225px;
 }
 .diapo3{
-	width: 50vw;
-	height: 70vh;
-	display: block;
-	margin-left: auto;
+    width: 50vw;
+    height: 70vh;
+    display: block;
+    margin-left: auto;
     margin-right: auto;
 }
 
 .webcam{
-	width: 300px;
-	height: 185px;
+    width: 300px;
+    height: 185px;
 }
 
 .webcam2{
-	width: 500px;
-	height: 320px;
+    width: 500px;
+    height: 320px;
 }
 
 .clearfix::after {
@@ -179,24 +179,24 @@ div#transcription {
 }
 
 #slides_direct{
-	background-color : red;
+    background-color : red;
 }
 
 .field_resource {
-	border-style: solid;
-	border-width: 1px;
-	padding : 10px;
-	position:relative;
+    border-style: solid;
+    border-width: 1px;
+    padding : 10px;
+    position:relative;
 }
 
 .nom_ressource{
-	font-size: 14px;
+    font-size: 14px;
 }
 
 .tag_ressource{
-	font-style: italic;
-	float:right;
-	color:DarkGreen;
+    font-style: italic;
+    float:right;
+    color:DarkGreen;
 }
 
 .messagepop {
@@ -214,54 +214,54 @@ div#transcription {
 }
 
 .contenant{
-	position:relative;
+    position:relative;
 }
 
 .tick {
-	width: 1.2em;
-	height: .8em;
-	text-align: center;
-	border-left: 1px solid #999;
-	float:left;
-	position: absolute;
+    width: 1.2em;
+    height: .8em;
+    text-align: center;
+    border-left: 1px solid #999;
+    float:left;
+    position: absolute;
 }
 
 .indicateur_fond{
-	background-color: #DDDDDD;
-	border-style: solid;
-	border-width: 1px;
-	width : 300px;
-	height: 30px;
-	position : relative;
+    background-color: #DDDDDD;
+    border-style: solid;
+    border-width: 1px;
+    width : 300px;
+    height: 30px;
+    position : relative;
 }
 
 .indicateur_barre{
-	background-color: red;
-	height : 20px;
-	z-index: 2;
-	position: absolute;
-	top: 5px;
-	left:0;
+    background-color: red;
+    height : 20px;
+    z-index: 2;
+    position: absolute;
+    top: 5px;
+    left:0;
 }
 
 .indicateur_25{
-	background-color: black;
-	position: absolute;
-	width : 5px;
-	left : 0px;
-	height : 28px;
+    background-color: black;
+    position: absolute;
+    width : 5px;
+    left : 0px;
+    height : 28px;
 }
 
 .popup{
-	background-color: white;
-	position : absolute;
-	left : 50%;
-	top : 50%;
-	border-style : solid;
-	border-width : 1px;
-	width : 350px;
-	z-index: 2;
-	display : none;
+    background-color: white;
+    position : absolute;
+    left : 50%;
+    top : 50%;
+    border-style : solid;
+    border-width : 1px;
+    width : 350px;
+    z-index: 2;
+    display : none;
 }
 
 .uiBtn {
@@ -275,28 +275,28 @@ div#transcription {
 }
 
 .invisible{
-	display: none;
+    display: none;
 }
 
 .marges{
-	margin-left:1em;
-	margin-right: 1em;
+    margin-left:1em;
+    margin-right: 1em;
 }
 
 .retours{
-	height:350px;
-	overflow-x: visible;
-	overflow-y: auto;
+    height:350px;
+    overflow-x: visible;
+    overflow-y: auto;
 }
 
 .apercu_ressources{
-	height:100px;
-	overflow-x: visible;
-	overflow-y: auto;
+    height:100px;
+    overflow-x: visible;
+    overflow-y: auto;
 }
 
 .like{
-	background-color: LightGray;
+    background-color: LightGray;
     border-width: 1px;
     border-color: white;
     color:white;
@@ -305,39 +305,39 @@ div#transcription {
 }
 
 .description_ressource{
-	text-align: justify;
-	/*margin-bottom: 0px;*/
+    text-align: justify;
+    /*margin-bottom: 0px;*/
 }
 
 .overlay{
-	display: none;
-	height:100%;
-	width:100%;
-	position:absolute;
-	top:0;
-	left:0;
-	background-color:rgba(0,0,0,.50);
-	z-index: 100;
+    display: none;
+    height:100%;
+    width:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    background-color:rgba(0,0,0,.50);
+    z-index: 100;
 }
 
 .zoomContainer{
-	display: none;
-	height:100%;
-	width:100%;
-	position: relative;
+    display: none;
+    height:100%;
+    width:100%;
+    position: relative;
 }
 
 .diapoEnseignant{
-	height:100%;
-	width:100%;
-	position: relative;
+    height:100%;
+    width:100%;
+    position: relative;
 }
 
 .imageZoomee{
-	display: none;
-	position:absolute;
-	top:50%;
-	left: 50%;
+    display: none;
+    position:absolute;
+    top:50%;
+    left: 50%;
     margin-right: -50%;
     transform: translate(-50%, -50%);
 }
@@ -347,49 +347,49 @@ div#transcription {
 
 
 .PASTELcontainer{
-	width:100%;
-	/*max height?*/
-	height: 90vh;
-	display: flex;
-	flex-direction: row;
-	justify-content:space-between;
-	align-items: flex-start;
+    width:100%;
+    /*max height?*/
+    height: 90vh;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    align-items: flex-start;
 }
 
 .divGauche{
-	width: 20%;
-	flex:0 0 auto;
-	height:100%;
-	/*margin: auto;*/
+    width: 20%;
+    flex:0 0 auto;
+    height:100%;
+    /*margin: auto;*/
 }
 
 .divCentre{
-	/*margin: auto;*/
-	flex:1 1 auto;
-  	height:100%;
+    /*margin: auto;*/
+    flex:1 1 auto;
+    height:100%;
 }
 
 .divDroite{
-	width: 30%;
-	flex:0 0 auto;
-	/*margin: auto;*/
+    width: 30%;
+    flex:0 0 auto;
+    /*margin: auto;*/
 }
 
 .flexVertical{
-	display: flex;
-	flex-direction: column ;
-	justify-content:space-between;
-	align-items:center;
+    display: flex;
+    flex-direction: column ;
+    justify-content:space-between;
+    align-items:center;
 }
 
 .scrollRessourcesQuestions{
-	width: 100%;
-	height: 350px;
+    width: 100%;
+    height: 350px;
 
-	border-style: solid;
-	border-width: 1px;
-	position:relative;
-	display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
+    border-style: solid;
+    border-width: 1px;
+    position:relative;
+    display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
     display: -moz-box; /* OLD - Firefox 19- (buggy but mostly works) */
     display: -ms-flexbox; /* TWEENER - IE 10 */
     display: -webkit-flex; /* NEW - Chrome */
@@ -401,12 +401,12 @@ div#transcription {
 }
 
 .scrollRessourcesCommun{
-	width: 100%;
-	height: 175px;
-	border-style: solid;
-	border-width: 1px;
-	position:relative;
-	display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
+    width: 100%;
+    height: 175px;
+    border-style: solid;
+    border-width: 1px;
+    position:relative;
+    display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
     display: -moz-box; /* OLD - Firefox 19- (buggy but mostly works) */
     display: -ms-flexbox; /* TWEENER - IE 10 */
     display: -webkit-flex; /* NEW - Chrome */
@@ -418,10 +418,10 @@ div#transcription {
 }
 
 .scrollRessourcesInside{
-	overflow-y: scroll;
-	/*padding-top: 25px;*/
-	bottom:0;
-	-webkit-box-flex: 1; /* OLD - iOS 6-, Safari 3.1-6 */
+    overflow-y: scroll;
+    /*padding-top: 25px;*/
+    bottom:0;
+    -webkit-box-flex: 1; /* OLD - iOS 6-, Safari 3.1-6 */
     -moz-box-flex: 1; /* OLD - Firefox 19- */
     -webkit-flex: 1; /* Chrome */
     -ms-flex: 1; /* IE 10 */
@@ -459,39 +459,39 @@ div#transcription {
 }
 
 .navigation{
-	flex:0 0 auto;
-	display: flex;
-	flex-direction: row;
-	justify-content:space-around;
-	align-items:center;
-	width: 70%;
-	border-style: solid;
-	border-width: 1px;
-	height: 50px;
+    flex:0 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items:center;
+    width: 70%;
+    border-style: solid;
+    border-width: 1px;
+    height: 50px;
 }
 
 .buttonInformation{
-	flex:0 0 auto;
+    flex:0 0 auto;
 }
 
 .transcription{
-	width:100%;
-	height: 100px;
-	border-style: solid;
-	border-width: 1px;
-	overflow-y: scroll;
+    width:100%;
+    height: 100px;
+    border-style: solid;
+    border-width: 1px;
+    overflow-y: scroll;
 }
 
 .transcriptionPetite{
-	flex:0 0 auto;
+    flex:0 0 auto;
 }
 
 .transcriptionGrande{
-	flex:1 1 auto;
+    flex:1 1 auto;
 }
 
 .elementFlex{
-	flex:0 0 auto;
+    flex:0 0 auto;
 }
 
 .zoomedPreview{
@@ -504,18 +504,18 @@ div#transcription {
 }
 
 .zoomedNav{
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .zoomedRessources{
-	width: 100%;
-	height: 47%;
-	border-style: solid;
-	border-width: 1px;
-	position:relative;
-	display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
+    width: 100%;
+    height: 47%;
+    border-style: solid;
+    border-width: 1px;
+    position:relative;
+    display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6 */
     display: -moz-box; /* OLD - Firefox 19- (buggy but mostly works) */
     display: -ms-flexbox; /* TWEENER - IE 10 */
     display: -webkit-flex; /* NEW - Chrome */
@@ -527,16 +527,16 @@ div#transcription {
 }
 
 .zoomedTranscription{
-	width:100%;
-	height: 100%;
-	border-style: solid;
-	border-width: 1px;
-	flex:0 0 auto;
-	overflow-y: scroll;
+    width:100%;
+    height: 100%;
+    border-style: solid;
+    border-width: 1px;
+    flex:0 0 auto;
+    overflow-y: scroll;
 }
 
 .zoomedParagraph{
-	padding:10px;
+    padding:10px;
 }
 
 .diapositiveReduite{
@@ -551,22 +551,22 @@ div#transcription {
 }
 
 .survolMain{
-	cursor: pointer;
+    cursor: pointer;
 }
 
 #hauteurNotes{
-	height: 80vh;
+    height: 80vh;
 }
 
 .hidden{
-	visibility: hidden;
+    visibility: hidden;
 }
 
 .vote_barre{
-	background-color: blue;
-	height : 20px;
-	z-index: 2;
-	position: absolute;
-	top: 5px;
-	left:0;
+    background-color: blue;
+    height : 20px;
+    z-index: 2;
+    position: absolute;
+    top: 5px;
+    left:0;
 }
