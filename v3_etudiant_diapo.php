@@ -45,27 +45,7 @@ if ($id) {
   $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
   $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
   $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
-// } else {
-//     error('You must specify a course_module ID or an instance ID');
 }
-
-$resource1 = $DB->get_record('pastel_resource', array('id'=>'28'));
-$lien1 = $resource1->url;
-$titre1 = $resource1->title;
-$domaine1 = $resource1->source;
-$description1 = $resource1->description;
-
-$resource2 = $DB->get_record('pastel_resource', array('id'=>'29'));
-$lien2 = $resource2->url;
-$titre2 = $resource2->title;
-$domaine2 = $resource2->source;
-$description2 = $resource2->description;
-
-$resource3 = $DB->get_record('pastel_resource', array('id'=>'30'));
-$lien3 = $resource3->url;
-$titre3 = $resource3->title;
-$domaine3 = $resource3->source;
-$description3 = $resource3->description;
 
 $cours = $DB->get_record('pastel', array('id'=>$instanceId)); // NUMERO DU COURS - PAS DUR
 $totalDiapo = $cours->intro;
@@ -83,9 +63,6 @@ $notesImportees = $DB->get_records_sql('SELECT * FROM {pastel_user_event} WHERE 
 $notes = $notesImportees->data;
 
 // $stockTranscription = $DB->get_records_sql('SELECT * FROM {pastel_transcription} WHERE activity = 263 AND timecreated > 1512165790');
-
-
-
 
 $changements = $DB->get_records_sql('SELECT timecreated,page FROM {pastel_slide} WHERE course = '.$courseId.' AND activity = '.$id.'');
 
@@ -111,25 +88,10 @@ $PAGE->set_title(format_string($pastel->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->requires->js_call_amd('mod_pastel/pastel_scripts', 'init');
 
-/*
- * Other things you may want to set - remove if not needed.
- * $PAGE->set_cacheable(false);
- * $PAGE->set_focuscontrol('some-html-id');
- * $PAGE->add_body_class('pastel-'.$somevar);
- */
-
 // Output starts here.
 echo $OUTPUT->header(
 
 );
-
-// Conditions to show the intro can change to look for own settings or whatever.
-// if ($pastel->intro) {
-//   echo $OUTPUT->box(format_module_intro('pastel', $pastel, $cm->id), 'generalbox mod_introbox', 'pastelintro');
-// }
-
-// Replace the following lines with you own code.
-// echo $OUTPUT->heading('Test de heading');
 
 $lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.' AND activity='.$id.' ORDER BY id DESC limit 1');
 $nbDiapo = $lastChange->page ?: 1;
@@ -308,9 +270,6 @@ print('
     </div>
    ');
 
-//print("#####");
-//print_r($slides);
-//print_r($transcription);
 
 print('
     </div>
@@ -483,21 +442,6 @@ foreach ($notesImportees as $item){
       notifierAlerte("alert","speed",diapoVisualisee,"");
     });
 
-    // A SUPPRIMER
-    // document.getElementById("alert_difficulty_2").addEventListener("click", function() {
-    //   notifierAlerte("alert","difficulty","");
-    //   document.getElementById("alert_difficulty_2").style.background = "red";
-    // });
-
-    //document.getElementById("link_previous").addEventListener("click", function() {
-    //   if (diapoCourante>1) {
-    //     pageArriere();
-    //     diapoVisualisee -=1;
-    //     notifierAlerte(\'alert\',\'precedent\', diapoVisualisee ,"");
-    //     setDirect(false);
-    //     return false;
-    //   }
-    //});
 
     function diapoPrevious(){
       if (diapoCourante>1) {
@@ -509,16 +453,6 @@ foreach ($notesImportees as $item){
       }
       console.log(diapoVisualisee);
     }
-
-    // document.getElementById("link_next").addEventListener("click", function() {
-    //   if (diapoVisualisee<diapoCourante) {
-    //     pageAvant();
-    //     diapoVisualisee +=1;
-    //     notifierAlerte(\'alert\',\'suivant\', diapoVisualisee ,"");
-    //     setDirect(false);
-    //     return false;
-    //   }
-    // });
 
     function diapoNext(){
       if (diapoVisualisee<diapoCourante) {
@@ -547,9 +481,6 @@ foreach ($notesImportees as $item){
       setDirect(true);
     }
 
-    // document.getElementById("slides_direct").addEventListener("click", function() {
-    //   setDirect(!state_direct);
-    // });
 
     function showPopup(element){
       $(".popup").show();
@@ -559,17 +490,6 @@ foreach ($notesImportees as $item){
       var haut = $("#resources_view").offset();
       $(".popup").css("top", haut.top);
 
-      //var coordTranscript = $("#transcription").offset();
-      // if (coordParent.top > coordTranscript.top ) {
-      //   $(".popup").css("top", coordParent.top - 50);
-      // } else {
-      //   $(".popup").css("top", coordTranscript.top - 25);
-      // }
-      // if (coordParent.bottom > coordTranscript.bottom ) {
-      //   $(".popup").css("bottom", coordParent.bottom - 50);
-      // } else {
-      //   $(".popup").css("bottom", coordTranscript.bottom - 25);
-      // }
       $(".popup").addClass("selected");
     }
 
@@ -581,21 +501,16 @@ foreach ($notesImportees as $item){
     function gestionPopup (element){
       if ($(element).hasClass("selected")){
         objParagraphe.parent().css("background-color", "transparent" );
-        //notifierAlerte("popup", "notesEditor", paragrapheClique, CKEDITOR.instances.popupNotes.getData());
-        //stockNotes[paragrapheClique] = CKEDITOR.instances.popupNotes.getData();
-        //hidePopup();
         $(element).removeClass("selected");
       } else {
         
         objParagraphe = $(element);
-        //showPopup(element);
         paragrapheClique = element.innerHTML;
         var souchaine = paragrapheClique.substring(0,20);
         var sousouchaine = souchaine.replace(/[^0-9]/g, "");
         paragrapheClique = parseInt(sousouchaine);
         diapoVisualisee=paragrapheClique;
         $("input[name=num_Diapo]").val(diapoVisualisee);
-        //CKEDITOR.instances.popupNotes.setData(stockNotes[paragrapheClique]);
         actualiserDiapo(paragrapheClique);
         $(".selected").parent().css("background-color", "transparent" );
         $(".selected").removeClass("selected");
@@ -607,14 +522,11 @@ foreach ($notesImportees as $item){
 
     //_____________________________________________________________________________________________________________
 
-  //   function testWebSocket()
-  // {
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
     websocket.onmessage = function(evt) { onMessage(evt) };
     websocket.onerror = function(evt) { onError(evt) };
-  // }
 
   function onOpen(evt)
   {
@@ -656,13 +568,7 @@ foreach ($notesImportees as $item){
     bloc.innerHTML += message.text ;
     if (state_direct){
       $(".transcription").scrollTo("100%");
-    } else {
     }
-
-    //var pre = document.createElement("p");
-    //pre.style.wordWrap = "break-word";
-    //pre.innerHTML = message.text;
-    //bloc.appendChild(pre);
   }
 
   // RÉCEPTION D UN CHANGEMENT DE PAGE PAR WEBSOCKET
@@ -691,80 +597,7 @@ foreach ($notesImportees as $item){
       
       ajoutBlocRessource(message);
     }
-    if (message["mime"]=="ressources_externes"){
 
-
-
-      // stockRessource.push(message);
-      // stockRessource.splice(0,1);
-
-      // console.log(stockRessource);
-
-      // $("#url5").attr("href", stockRessource[0]["url"]);
-      // $("#url5").html(stockRessource[0]["title"]);
-      // $("#description5").html(stockRessource[0]["description"]);
-      // var couleurLike = $("like4").css( "background-color" );
-      // $("#like5").css( "background-color", couleurLike );
-      // var couleurDislike = $("dislike4").css( "background-color" );
-      // $("#dislike5").css( "background-color", "couleurDislike" );
-
-      // $("#url4").attr("href", stockRessource[1]["url"]);
-      // $("#url4").html(stockRessource[1]["title"]);
-      // $("#description4").html(stockRessource[1]["description"]);
-      // var couleurLike = $("like3").css( "background-color" );
-      // $("#like4").css( "background-color", couleurLike );
-      // var couleurDislike = $("dislike3").css( "background-color" );
-      // $("#dislike4").css( "background-color", "couleurDislike" );
-
-      // $("#url3").attr("href", stockRessource[2]["url"]);
-      // $("#url3").html(stockRessource[2]["title"]);
-      // $("#description3").html(stockRessource[2]["description"]);
-      // var couleurLike = $("like2").css( "background-color" );
-      // $("#like3").css( "background-color", couleurLike );
-      // var couleurDislike = $("dislike2").css( "background-color" );
-      // $("#dislike3").css( "background-color", "couleurDislike" );
-
-      // $("#url2").attr("href", stockRessource[3]["url"]);
-      // $("#url2").html(stockRessource[3]["title"]);
-      // $("#description2").html(stockRessource[3]["description"]);
-      // var couleurLike = $("like1").css( "background-color" );
-      // $("#like2").css( "background-color", couleurLike );
-      // var couleurDislike = $("dislike1").css( "background-color" );
-      // $("#dislike2").css( "background-color", "couleurDislike" );
-
-      // $("#url1").attr("href", stockRessource[4]["url"]);
-      // $("#url1").html(stockRessource[4]["title"]);
-      // $("#description1").html(stockRessource[4]["description"]);
-      // $("#like1").css( "background-color", "LightGray" );
-      // $("#dislike1").css( "background-color", "LightGray" );
-    }
-
-    if (message["mime"]=="questions"){
-      // stockQuestions.push(message);
-      // stockQuestions.splice(0,1);
-
-      // $("#url8").attr("href", stockQuestions[0]["url"]);
-      // $("#url8").html(stockQuestions[0]["title"]);
-      // $("#description8").html(stockQuestions[0]["description"]);
-      // var couleurLike = $("like7").css( "background-color" );
-      // $("#like8").css( "background-color", couleurLike );
-      // var couleurDislike = $("dislike7").css( "background-color" );
-      // $("#dislike8").css( "background-color", "couleurDislike" );
-
-      // $("#url7").attr("href", stockQuestions[1]["url"]);
-      // $("#url7").html(stockQuestions[1]["title"]);
-      // $("#description7").html(stockQuestions[1]["description"]);
-      // var couleurLike = $("like6").css( "background-color" );
-      // $("#like7").css( "background-color", couleurLike );
-      // var couleurDislike = $("dislike6").css( "background-color" );
-      // $("#dislike7").css( "background-color", "couleurDislike" );
-
-      // $("#url6").attr("href", stockQuestions[2]["url"]);
-      // $("#url6").html(stockQuestions[2]["title"]);
-      // $("#description6").html(stockQuestions[2]["description"]);
-      // $("#like6").css( "background-color", "LightGray" );
-      // $("#dislike3").css( "background-color", "LightGray" );
-    }
   }
 
   function indicator(message) {
@@ -850,9 +683,7 @@ foreach ($notesImportees as $item){
 
     pre.appendChild(bloc);
     output.appendChild(pre);
-  }
-
-  
+  }  
 
   function ajouterTick(coord){
     var div = document.getElementById("progressbarContenant");
@@ -864,7 +695,6 @@ foreach ($notesImportees as $item){
 
   function actualiserDiapo(num){
     document.getElementById("slides_view").src="'.$url_diapo.'".concat(numeroDiapo(num)).concat(".jpg");
-    //document.getElementById("slides_view_big").src="'.$url_diapo.'".concat(numeroDiapo(num)).concat(".jpg");
     document.getElementById("slides_view_prec").src="'.$url_diapo.'".concat(numeroDiapo(num-1)).concat(".jpg");
     document.getElementById("slides_view_next").src="'.$url_diapo.'".concat(numeroDiapo(num+1)).concat(".jpg");
   }
@@ -875,17 +705,11 @@ foreach ($notesImportees as $item){
     //notifierAlerte("alert", "direct",0, b);
     console.log(state_direct);
     if(b===true){
-      //$("#slides_direct").css( "background-color", "red" );
-      //$("#progressbar").progressbar("value",100);
-      //$("#transcription").scrollTo("100%");
       notifierAlerte("alert","repriseDirect", diapoVisualisee ,"");
       diapoVisualisee = diapoCourante;
       var n = numeroDiapo(diapoCourante);
       document.getElementById("slides_view").src="'.$url_diapo.'" + n + ".jpg";
-      //document.getElementById("slides_view_big").src="'.$url_diapo.'" + n + ".jpg";
-      //notifierAlerte("alerte", "direct", 0, true);
     } else {
-      //$("#slides_direct").css( "background-color", "gray" );
       notifierAlerte("alerte", "direct", 0, "");
     }
   }
@@ -933,42 +757,6 @@ foreach ($notesImportees as $item){
       $(".imageZoomee").hide();
     }
   }
-
-  // $("#slides_view").click(notifierZoom("zoom"));
-  // $("#slides_view_big").click(notifierZoom("dezoom"));
-  // $("#overlay").click(notifierZoom("dezoom"));
-
-  // function notifierZoom(stri){
-  //   notifierAlerte("diapo",stri,0,"");
-  // }
-
-  // var a = document.getElementById("link_previous");
-  // $("#link_previous").click( function() {
-  //   alert("PREV");
-  //   if (diapoCourante>1) {
-  //     pageArriere();
-  //     diapoVisualisee -=1;
-  //     notifierAlerte(\'alert\',\'precedent\', diapoVisualisee ,"");
-  //     setDirect(false);
-  //     return false;
-  //   }
-  // });
-
-    //window.onload = function() {
-      
-
-      // var b = document.getElementById("link_next");
-      // b.onclick = function() {
-      //   alert("NEXT");
-      //   if (diapoVisualisee<diapoCourante) {
-      //     pageAvant();
-      //     diapoVisualisee +=1;
-      //     notifierAlerte(\'alert\',\'suivant\', diapoVisualisee ,"");
-      //     setDirect(false);
-      //     return false;
-      //   }
-      // }
-    //}
 
   //________V3
   function cacherGauche(){
@@ -1080,8 +868,6 @@ foreach ($notesImportees as $item){
 
 
   </script>
-
-
 
   ');
 
