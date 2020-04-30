@@ -21,9 +21,11 @@
  * lib.php/modulename_install() post installation hook and partially defaults.php.
  *
  * @package    mod_pastel
- * @copyright  2016 Your Name <your@email.address>
+ * @copyright  2020 LIUM
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Post installation procedure
