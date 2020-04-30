@@ -31,8 +31,6 @@
 
 defined ( 'MOODLE_INTERNAL' ) || die ();
 
-define ( 'pastel_ULTIMATE_ANSWER', 42 );
-
 
 /**
  * Returns the information on whether the module supports a feature
@@ -322,14 +320,14 @@ function mod_pastel_get_server_port() {
         return 8000;
     }
 }
-function mod_pastel_update_user_status($user_id, $status, $info) {
+function mod_pastel_update_user_status($userid, $status, $info) {
     global $DB;
 
     try {
         $record = new stdClass ();
         $time = new DateTime ( "now", core_date::get_user_timezone_object () );
         $record->timecreated = $time->getTimestamp ();
-        $record->user_id = $user_id;
+        $record->user_id = $userid;
         $record->role = $info->role;
         $record->course = $info->course;
         $record->activity = $info->activity;
@@ -338,17 +336,17 @@ function mod_pastel_update_user_status($user_id, $status, $info) {
         $DB->insert_record ( 'pastel_connection', $record );
         return true;
     } catch ( Exception $e ) {
-        mod_pastel_saveError($user_id, 'user_status:' . $e->getMessage ());
+        mod_pastel_saveerror($userid, 'user_status:' . $e->getMessage ());
         return false;
     }
 }
-function mod_pastel_transcription($user_id, $params) {
+function mod_pastel_transcription($userid, $params) {
     global $DB;
 
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
-        $record->user_id = $user_id;
+        $record->user_id = $userid;
         $record->course = $params->course;
         $record->activity = $params->activity;
         $record->text = $params->text;
@@ -363,17 +361,17 @@ function mod_pastel_transcription($user_id, $params) {
         $DB->insert_record ( 'pastel_transcription', $record );
         return true;
     } catch ( Exception $e ) {
-        mod_pastel_saveError($user_id, 'transcription:' . $e->getMessage ());
+        mod_pastel_saveerror($userid, 'transcription:' . $e->getMessage ());
         return false;
     }
 }
-function mod_pastel_chgtPage($user_id, $params) {
+function mod_pastel_chgtpage($userid, $params) {
     global $DB;
 
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
-        $record->user_id = $user_id;
+        $record->user_id = $userid;
         $record->navigation = $params->navigation;
         $record->page = $params->page;
         $record->course = $params->course;
@@ -382,17 +380,17 @@ function mod_pastel_chgtPage($user_id, $params) {
         $DB->insert_record ( 'pastel_slide', $record );
         return true;
     } catch ( Exception $e ) {
-        mod_pastel_saveError($user_id, 'chgtPage:' . $e->getMessage ());
+        mod_pastel_saveerror($userid, 'chgtPage:' . $e->getMessage ());
         return false;
     }
 }
-function mod_pastel_addRessource($user_id, $params) {
+function mod_pastel_addressource($userid, $params) {
     global $DB;
 
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
-        $record->user_id = $user_id;
+        $record->user_id = $userid;
         $record->course = $params->course;
         $record->activity = $params->activity;
 
@@ -408,17 +406,17 @@ function mod_pastel_addRessource($user_id, $params) {
         $DB->insert_record ( 'pastel_resource', $record );
         return true;
     } catch ( Exception $e ) {
-        mod_pastel_saveError($user_id, 'addRessource:' . $e->getMessage ());
+        mod_pastel_saveerror($userid, 'addRessource:' . $e->getMessage ());
         return false;
     }
 }
-function mod_pastel_indicator($user_id, $params) {
-    global $DB;
 
+function mod_pastel_indicator($userid, $params) {
+    global $DB;
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
-        $record->user_id = $user_id;
+        $record->user_id = $userid;
         $record->data = $params->data;
         $record->course = $params->course;
         $record->activity = $params->activity;
@@ -426,17 +424,18 @@ function mod_pastel_indicator($user_id, $params) {
         $DB->insert_record ( 'pastel_indicator', $record );
         return true;
     } catch ( Exception $e ) {
-        mod_pastel_saveError($user_id, 'indicator:' . $e->getMessage ());
+        mod_pastel_saveerror($userid, 'indicator:' . $e->getMessage ());
         return false;
     }
 }
-function mod_pastel_saveError($user_id, $message) {
+
+function mod_pastel_saveerror($userid, $message) {
     global $DB;
     try {
         $record = new stdClass ();
         $time = new DateTime ( "now", core_date::get_user_timezone_object () );
         $record->timecreated = $time->getTimestamp ();
-        $record->user_id = $user_id;
+        $record->user_id = $userid;
         $record->message = $message;
 
         $DB->insert_record ( 'pastel_error', $record );
@@ -445,14 +444,13 @@ function mod_pastel_saveError($user_id, $message) {
     }
 }
 
-
-function mod_pastel_userEvent($user_id, $params) {
+function mod_pastel_userevent($userid, $params) {
     global $DB;
 
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
-        $record->user_id = $user_id;
+        $record->user_id = $userid;
         $record->container = $params->container;
         $record->object = $params->object;
         $record->nature = $params->nature;
@@ -464,17 +462,17 @@ function mod_pastel_userEvent($user_id, $params) {
         $DB->insert_record ( 'pastel_user_event', $record );
         return true;
     } catch ( Exception $e ) {
-        mod_pastel_saveError($user_id, 'user_event:' . $e->getMessage ());
+        mod_pastel_saveerror($userid, 'user_event:' . $e->getMessage ());
         return false;
     }
 }
 
-function mod_pastel_get_maxPage($params) {
+function mod_pastel_get_maxpage($params) {
     global $DB;
     $maxpage = -1;
     try {
-        $reqInstance = "select instance from {course_modules} where id=".$params->activity;
-        $instance = $DB->get_record_sql($reqInstance, array());
+        $reqinstance = "select instance from {course_modules} where id=".$params->activity;
+        $instance = $DB->get_record_sql($reqinstance, array());
         $req = "select intro from {pastel} where id=".$instance->instance;
         $description = $DB->get_record_sql($req, array());
         $maxpage = intval(trim($description->intro));
