@@ -8,11 +8,11 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Library of interface functions and constants for module pastel
@@ -74,15 +74,13 @@ function pastel_supports($feature) {
  */
 function pastel_add_instance(stdClass $pastel, mod_pastel_mod_form $mform = null) {
     global $DB;
-    
+
     $pastel->timecreated = time ();
-    
+
     // You may have to add extra stuff in here.
-    
+
     $pastel->id = $DB->insert_record ( 'pastel', $pastel );
-    
-//    pastel_grade_item_update ( $pastel );
-    
+
     return $pastel->id;
 }
 
@@ -101,16 +99,14 @@ function pastel_add_instance(stdClass $pastel, mod_pastel_mod_form $mform = null
  */
 function pastel_update_instance(stdClass $pastel, mod_pastel_mod_form $mform = null) {
     global $DB;
-    
+
     $pastel->timemodified = time ();
     $pastel->id = $pastel->instance;
-    
+
     // You may have to add extra stuff in here.
-    
+
     $result = $DB->update_record ( 'pastel', $pastel );
-    
-  //  pastel_grade_item_update ( $pastel );
-    
+
     return $result;
 }
 
@@ -127,14 +123,14 @@ function pastel_update_instance(stdClass $pastel, mod_pastel_mod_form $mform = n
  */
 function pastel_refresh_events($courseid = 0) {
     global $DB;
-    
+
     if ($courseid == 0) {
         if (! $pastels = $DB->get_records ( 'pastel' )) {
             return true;
         }
     } else {
         if (! $pastels = $DB->get_records ( 'pastel', array (
-                'course' => $courseid 
+                'course' => $courseid
         ) )) {
             return true;
         }
@@ -156,21 +152,11 @@ function pastel_refresh_events($courseid = 0) {
  */
 function pastel_delete_instance($id) {
     global $DB;
-    
-    if (! $pastel = $DB->get_record ( 'pastel', array (
-            'id' => $id 
-    ) )) {
+    if (! $pastel = $DB->get_record('pastel', array ('id' => $id))) {
         return false;
     }
-    
     // Delete any dependent records here.
-    
-    $DB->delete_records ( 'pastel', array (
-            'id' => $pastel->id 
-    ) );
-    
-//    pastel_grade_item_delete ( $pastel );
-    
+    $DB->delete_records ( 'pastel', array ('id' => $pastel->id));
     return true;
 }
 
@@ -314,7 +300,7 @@ function pastel_get_extra_capabilities() {
  */
 function mod_pastel_get_server_name() {
     global $CFG;
-    
+
     if (! empty ( $CFG->mod_pastel_server_name )) {
         return $CFG->mod_pastel_server_name;
     } else {
@@ -329,7 +315,7 @@ function mod_pastel_get_server_name() {
  */
 function mod_pastel_get_server_port() {
     global $CFG;
-    
+
     if (! empty ( $CFG->mod_pastel_server_port )) {
         return $CFG->mod_pastel_server_port;
     } else {
@@ -338,7 +324,7 @@ function mod_pastel_get_server_port() {
 }
 function mod_pastel_update_user_status($user_id, $status, $info) {
     global $DB;
-    
+
     try {
         $record = new stdClass ();
         $time = new DateTime ( "now", core_date::get_user_timezone_object () );
@@ -348,7 +334,7 @@ function mod_pastel_update_user_status($user_id, $status, $info) {
         $record->course = $info->course;
         $record->activity = $info->activity;
         $record->status = $status;
-        
+
         $DB->insert_record ( 'pastel_connection', $record );
         return true;
     } catch ( Exception $e ) {
@@ -358,7 +344,7 @@ function mod_pastel_update_user_status($user_id, $status, $info) {
 }
 function mod_pastel_transcription($user_id, $params) {
     global $DB;
-    
+
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
@@ -373,7 +359,7 @@ function mod_pastel_transcription($user_id, $params) {
             $record->final = 0;
         }
         $record->timesend = $params->timesend;
-        
+
         $DB->insert_record ( 'pastel_transcription', $record );
         return true;
     } catch ( Exception $e ) {
@@ -383,7 +369,7 @@ function mod_pastel_transcription($user_id, $params) {
 }
 function mod_pastel_chgtPage($user_id, $params) {
     global $DB;
-    
+
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
@@ -392,7 +378,7 @@ function mod_pastel_chgtPage($user_id, $params) {
         $record->page = $params->page;
         $record->course = $params->course;
         $record->activity = $params->activity;
-        
+
         $DB->insert_record ( 'pastel_slide', $record );
         return true;
     } catch ( Exception $e ) {
@@ -402,23 +388,23 @@ function mod_pastel_chgtPage($user_id, $params) {
 }
 function mod_pastel_addRessource($user_id, $params) {
     global $DB;
-    
+
     try {
         $record = new stdClass ();
         $record->timecreated = $params->timecreated;
         $record->user_id = $user_id;
         $record->course = $params->course;
         $record->activity = $params->activity;
-        
+
         $record->url = $params->url;
         $record->title = $params->title;
         $record->description = $params->description;
         $record->source = $params->source;
         $record->mime = $params->mime;
         $record->tag = $params->tag;
-        
+
         $record->timesend = $params->timesend;
-        
+
         $DB->insert_record ( 'pastel_resource', $record );
         return true;
     } catch ( Exception $e ) {
@@ -452,7 +438,7 @@ function mod_pastel_saveError($user_id, $message) {
         $record->timecreated = $time->getTimestamp ();
         $record->user_id = $user_id;
         $record->message = $message;
-        
+
         $DB->insert_record ( 'pastel_error', $record );
     } catch ( Exception $e ) {
         echo 'erreur lors de l ecriture des erreurs en bdd !!';
@@ -492,7 +478,7 @@ function mod_pastel_get_maxPage($params) {
         $req = "select intro from {pastel} where id=".$instance->instance;
         $description = $DB->get_record_sql($req, array());
         $maxpage = intval(trim($description->intro));
-        
+
         echo 'Page max = ' . $maxpage . ' instance = ' . $instance->instance .   PHP_EOL;
     } catch ( Exception $err ) {
         echo 'max page indetermine pour activity = ' . $params->activity .'  ERREUR :' . $err->getMessage () . PHP_EOL;

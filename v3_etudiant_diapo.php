@@ -33,54 +33,39 @@ require_once(__DIR__.'/tool_demo/output/index_page.php');
 global $DB, $COURSE, $CFG, $USER;
 
 $instanceId = optional_param('instanceid', 0, PARAM_INT);
-$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID
+$n  = optional_param('n', 0, PARAM_INT);  // Pastel instance ID.
 $courseId = optional_param('courseid', 0, PARAM_INT);
-$n  = optional_param('n', 0, PARAM_INT);  // ... pastel instance ID - it should be named as the first character of the module.
 
 if ($id) {
-  $cm         = get_coursemodule_from_id('pastel', $id, 0, false, MUST_EXIST);
-  $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-  $pastel  = $DB->get_record('pastel', array('id' => $cm->instance), '*', MUST_EXIST);
+    $cm      = get_coursemodule_from_id('pastel', $id, 0, false, MUST_EXIST);
+    $course  = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $pastel  = $DB->get_record('pastel', array('id' => $cm->instance), '*', MUST_EXIST);
 } else if ($n) {
-  $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
-  $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
-  $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
+    $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
+    $course  = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
+    $cm      = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
 }
 
-$cours = $DB->get_record('pastel', array('id'=>$instanceId)); // NUMERO DU COURS - PAS DUR
+$cours = $DB->get_record('pastel', array('id' => $instanceId));
 $totalDiapo = $cours->intro;
 $adresseStream = $cours->stream;
 $beginning = $cours->timedebut;
 
-$slides = $DB->get_records_sql('SELECT * FROM {pastel_slide} WHERE activity = '.$id.' AND timecreated > '.$beginning);  // A FAIRE IMPORTANT : RETIRER activity CAR on peut l'avoir dans la table course_module, enlever le contrôle qui vient de cette ligne
-
-$slide1 = $DB->get_record_sql('SELECT MAX(id) AS maxid FROM {pastel_slide} WHERE timecreated < 1508851917'); // S à records, MIN(id) ; code 15h33
-$slide1bis = $slide1->maxid;
-
-$transcription = $DB->get_records_sql('SELECT * FROM {pastel_transcription} WHERE activity = '.$id.' AND timecreated > '.$beginning);
-
-$notesImportees = $DB->get_records_sql('SELECT * FROM {pastel_user_event} WHERE user_id = '.$USER->id.' AND activity = '.$id.' AND object = "notesEditor" AND timecreated >'.$beginning);
+$slides = $DB->get_records_sql('SELECT * FROM {pastel_slide} WHERE activity = '.$id.' AND timecreated > '.$beginning);
+$transcription = $DB->get_records_sql('SELECT * FROM {pastel_transcription}
+                                        WHERE activity = '.$id.' AND timecreated > '.$beginning);
+$notesImportees = $DB->get_records_sql('SELECT * FROM {pastel_user_event}
+                                        WHERE user_id = '.$USER->id.' AND activity = '.$id.
+                                        ' AND object = "notesEditor" AND timecreated >'.$beginning);
 $notes = $notesImportees->data;
-
-// $stockTranscription = $DB->get_records_sql('SELECT * FROM {pastel_transcription} WHERE activity = 263 AND timecreated > 1512165790');
-
-$changements = $DB->get_records_sql('SELECT timecreated,page FROM {pastel_slide} WHERE course = '.$courseId.' AND activity = '.$id.'');
-
+$changements = $DB->get_records_sql('SELECT timecreated, page FROM {pastel_slide}
+                                    WHERE course = '.$courseId.' AND activity = '.$id);
 $url_subname = $cours->nomdiapo;
-// SLIDES-CM-2017
 $url_diapo = "http://la-pastel.univ-lemans.fr/mod/pastel_/pix/page/".$url_subname."-page-";
-// require_login($course, true, $cm);
-
-// $event = \mod_pastel\event\course_module_viewed::create(array(
-//     'objectid' => $PAGE->cm->instance,
-//     'context' => $PAGE->context,
-// ));
-// $event->add_record_snapshot('course', $PAGE->course);
-// $event->add_record_snapshot($PAGE->cm->modname, $pastel);
-// $event->trigger();
+require_login($course, true, $cm);
 
 // Print the page header.
-
 $PAGE->set_pagelayout('popup');
 
 $PAGE->set_url('/mod/pastel/v3_etudiant_diapo.php', array('id' => $cm->id));
@@ -89,16 +74,13 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->requires->js_call_amd('mod_pastel/pastel_scripts', 'init');
 
 // Output starts here.
-echo $OUTPUT->header(
+echo $OUTPUT->header();
 
-);
-
-$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.' AND activity='.$id.' ORDER BY id DESC limit 1');
+$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.
+        ' AND activity='.$id.' ORDER BY id DESC limit 1');
 $nbDiapo = $lastChange->page ?: 1;
 
-print('
-  <script src="ckeditor/ckeditor.js"></script>
-
+print('<script src="ckeditor/ckeditor.js"></script>
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -107,32 +89,21 @@ print('
     var studentAnswers = [];
   </script>
 
-  
   <div class="PASTELcontainer">
-    
     <div style="display:none;" class="expandGauche">
       <button onclick="afficherGauche()">></button>
     </div>
+
     <div class="divGauche">
       <a href="' . $CFG->wwwroot . '/course/view.php?id=' . $courseId . '">Retour</a> <span id="info"> </span>
-      
       <button onclick="cacherGauche()"><</button>
-
       <iframe class="video" width="100%"
-          src="'.$adresseStream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0" 
+          src="'.$adresseStream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0"
           frameborder="0" allowfullscreen>
       </iframe>
 
       <div>
-        <button id="alert_speed">
-          Le cours va trop vite
-        </button>
-
-        <!--
-        <button class="buttonVideo" onclick="cacherVideo()">▲</button>
-        <button style="display:none" class="expandVideo" onclick="afficherVideo()">▼</button>
-        -->
-
+        <button id="alert_speed">Le cours va trop vite</button>
       </div>
 
       <form id="open_question_form" style="margin-top:5px; margin-bottom:5px;">
@@ -141,41 +112,8 @@ print('
 
       <div class="scrollRessourcesQuestions">
         <div style="right:25px;top:-4px;color:lightGray;font-weight: bold;z-index=-1;">RESSOURCES</div>
-        <div class="scrollRessourcesInside">
-          <!-- 
-          <button id="like1" class="like" onclick="like(this,0)">👍</button><button id="dislike1" class="like" onclick="dislike(this,0)">👎</button><a id="url1" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",1,"")></a><br />
-          <p id="description1" class="description_ressource"> </p>
-
-          <button id="like2" class="like" onclick="like(this,1)">👍</button><button id="dislike2" class="like" onclick="dislike(this,1)">👎</button><a id="url2" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",2,"")></a><br />
-          <p id="description2" class="description_ressource"> </p>
-
-          <button id="like3" class="like" onclick="like(this,2)">👍</button><button id="dislike3" class="like" onclick="dislike(this,2)">👎</button><a id="url3" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",3,"")></a><br />
-          <p id="description3" class="description_ressource"> </p>
-
-          <button id="like4" class="like" onclick="like(this,3)">👍</button><button id="dislike4" class="like" onclick="dislike(this,3)">👎</button><a id="url4" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",4,"")></a><br />
-          <p id="description4" class="description_ressource"> </p>
-
-          <button id="like5" class="like" onclick="like(this,4)">👍</button><button id="dislike5" class="like" onclick="dislike(this,4)">👎</button><a id="url5" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",5,"")></a><br />
-          <p id="description5" class="description_ressource"> </p>
-          -->
-
-        </div>
+        <div class="scrollRessourcesInside"> </div>
       </div>
-      <!-- <div class="scrollRessourcesCommun">
-        <div style="right:25px;top:-4px;color:lightGray;font-weight: bold;z-index=-1;">RESSOURCES EXTERNES</div>
-        <div class="scrollRessourcesInside">
-          <button id="like6" class="like" onclick="like(this,5)">👍</button><button id="dislike6" class="like" onclick="dislike(this,5)">👎</button><a id="url6" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",6,"")></a><br />
-          <p id="description6" class="description_ressource"> </p>
-
-          <button id="like7" class="like" onclick="like(this,6)">👍</button><button id="dislike7" class="like" onclick="dislike(this,6)">👎</button><a id="url7" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",7,"")></a><br />
-          <p id="description7" class="description_ressource"> </p>
-
-          <button id="like8" class="like" onclick="like(this,7)">👍</button><button id="dislike8" class="like" onclick="dislike(this,7)">👎</button><a id="url8" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",8,"")></a><br />
-          <p id="description8" class="description_ressource"> </p>
-        </div>
-      
-      </div>
-      -->
 
       <div class="hidden">
         <form id="answerQCM">
@@ -200,57 +138,59 @@ print('
             ">
         </form>
       </div>
-
     </div>
 
     <div class="divCentre flexVertical">
       <img id="slides_view" src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo).'.jpg" class="diapositive diapoPetite">
-      
-      <button class="needInfo" id="alert_difficulty" class="buttonInformation" onclick="notifierAlerte(\'alert\',\'difficulty\', diapoVisualisee ,\'\')">
+      <button class="needInfo" id="alert_difficulty" class="buttonInformation"
+            onclick="notifierAlerte(\'alert\',\'difficulty\', diapoVisualisee ,\'\')">
         Besoin de plus d\'information
       </button>
 
       <div class="navigation">
         <span id="link_beginning" onclick="diapoFirst()" class="survolMain"> << </span>
-        <img id="slides_view_prec" class="hidden" src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo -1).'.jpg" class="PASTELpreview elementFlex"> 
+        <img id="slides_view_prec" class="hidden"
+            src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo - 1).'.jpg" class="PASTELpreview elementFlex">
         <span id="link_previous" onclick="diapoPrevious();" class="survolMain"> < </span>
         <form style="padding-top:20px">
-          <input type="text" id="num_Diapo" autocomplete="off" name="num_Diapo" value="'.$nbDiapo.'" style="width:30px;"> <span>/</span><span class="max">'.$nbDiapo.'</span>
+          <input type="text" id="num_Diapo" autocomplete="off" name="num_Diapo"
+                value="'.$nbDiapo.'" style="width:30px;"> <span>/</span><span class="max">'.$nbDiapo.'</span>
         </form>
         <span id="link_next" class="survolMain" onclick="diapoNext();"> > </span>
-        <img id="slides_view_next" class="hidden" src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo +1).'.jpg" class="PASTELpreview elementFlex">
+        <img id="slides_view_next" class="hidden"
+             src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo + 1).'.jpg" class="PASTELpreview elementFlex">
         <span id="link_last" class="survolMain" onclick="diapoLast()"> >> </span>
       </div>
 
       <div id="transcription2" class="transcription transcriptionPetite">
-        ');
-        $keys = array_keys($slides);
-        foreach(array_keys($keys) AS $k ){
-        //for ($i=0; $i < count($slides); $i++) { 
-        //foreach ($slides as $x) {
-          if ($slides[$keys[$k]]->page != $slides[$keys[$k-1]]->page) {
-            print('<div class="transcriptWrapper"> <div class="blocTranscript" onclick="gestionPopup(this)">DIAPO ');
-            $y=$slides[$keys[$k]]->page;
-            print_r($y);
-            print(' : ');
-            foreach ($transcription as $z) {
-              if($slides[$keys[$k+1]]->timecreated != null){
-                if(($z->timecreated >= $slides[$keys[$k]]->timecreated and $z->timecreated < $slides[$keys[$k+1]]->timecreated)) {
-                  print_r($z->text);
+');
+$keys = array_keys($slides);
+foreach (array_keys($keys) as $k) {
+    if ($slides[$keys[$k]]->page != $slides[$keys[$k - 1]]->page) {
+        print('<div class="transcriptWrapper"> <div class="blocTranscript" onclick="gestionPopup(this)">DIAPO ');
+        $y = $slides[$keys[$k]]->page;
+        print($y);
+        print(' : ');
+        foreach ($transcription as $z) {
+            if ($slides[$keys[$k + 1]]->timecreated != null) {
+                if ($z->timecreated >= $slides[$keys[$k]]->timecreated and $z->timecreated < $slides[$keys[$k + 1]]->timecreated) {
+                    print($z->text);
                 }
-              } else {
-                print_r($z->text);
-              }
+            } else {
+                print($z->text);
             }
-            print('</div></div>');
-          }
-        } 
-        print('
-      </div>
+        }
+        print('</div></div>');
+    }
+}
 
+print('
+      </div>
       <div>  <!-- N EXISTE QUE POUR QUE LES ELEMENTS FILS SOIENT AU MEME NIVEAU -->
         <button class="buttonTranscription" onclick="cacherTranscription()">▼</button>
-        <a href="" style=""><img id="changeMode" style="height:25px;width:25px" src="expand.svg" onclick="changeLayout(1);return false;"></a>
+        <a href="" style="">
+            <img id="changeMode" style="height:25px;width:25px" src="expand.svg" onclick="changeLayout(1);return false;">
+        </a>
         <button style="display:none" class="expandTranscription" onclick="afficherTranscription()">▲</button>
       </div>
     </div>
@@ -260,22 +200,17 @@ print('
     </div>
     <div class="divDroite">
       <button onclick="cacherDroite()">></button>
-      <a target="_blank" href="' . $CFG->wwwroot . '/mod/pastel/view_export.php?id=' .$id. '" style="float:right;" style="float:right;" onclick="notifierAlerte("liens","export",0,"")">Export des notes</a>
+      <a target="_blank" href="' . $CFG->wwwroot . '/mod/pastel/view_export.php?id=' .$id.
+        '" style="float:right;" onclick="notifierAlerte("liens","export",0,"")">Export des notes</a>
       <br />
       <form id="formNotes">
         <textarea name="popupNotes" id="popupNotes"></textarea>
       </form>
     </div>
+  </div>');
 
-    </div>
-   ');
-
-
-print('
-    </div>
-    <script>
-    //_____________________________________________________________________________________________________________
-
+print('</div>
+  <script>
     var beginning = '.$beginning.' ;
     var momentClic = Date.now()/1000 - beginning;
     var paragrapheClique = 0 ;
@@ -284,41 +219,15 @@ print('
       height: 525
     });
 
-    // var editor = CKEDITOR.replace("popupNotes", { 
-    //   on : {
-    //      // maximize the editor on startup
-    //      "instanceReady" : function( evt ) {
-    //         evt.editor.resize("100%", $("#hauteurNotes").height());
-    //      }
-    //   }
-    // });
-
-    // CKEDITOR.replace("popupNotes", { 
-    //   on : {
-    //     // maximize the editor on startup
-    //     "instanceReady" : function( evt ) {
-    //       evt.editor.resize("100%", $("#hauteurNotes").height());
-    //     }
-    //   }
-    // });
-
     CKEDITOR.instances.popupNotes.on( "save", function( evt ) {
       notifierAlerte("notes", "notesEditor", paragrapheClique, evt.editor.getData());
-      // stockNotes[paragrapheClique] = evt.editor.getData();
-      // console.log(stockNotes);
       return false;
     });
-
-    
-
-    //var editeur = FCKeditorAPI.GetInstance("popupNotes");
 
     var surFrise = false ;
     var xFrise ;
     var pourcentage ;
     var offset ;
-
-    
 
     var diapoCourante = '.$nbDiapo.';
     var diapoVisualisee = diapoCourante;
@@ -341,39 +250,30 @@ print('
     var stockRessource = [{},{},{},{},{}];
     var stockQuestions = [{},{},{}];
 
-
     var objParagraphe;
-    ');
+');
 
-foreach ($changements as $item){
-  print('
+foreach ($changements as $item) {
+    print('
     if ('.$item->timecreated.' >= beginning){
     stockTemps.push(
       {stockTimestamp : '.$item->timecreated.', stockPage : '.$item->page.'}
-    );}
-  ');
+    );}');
 }
 
-foreach ($notesImportees as $item){
-  print('
-    stockNotes['.$item->page.'] = "'.$item->data.'";
-  ');
+foreach ($notesImportees as $item) {
+    print('
+    stockNotes['.$item->page.'] = "'.$item->data.'";');
 }
 
-    print(' 
-
+print('
     console.log(stockNotes[paragrapheClique]);
 
     CKEDITOR.instances.popupNotes.setData(stockNotes[paragrapheClique]);
-
     $(".transcription").scrollTo("100%");
-
     $( "#progressbar" ).height(15);
 
-    //setInterval(function(){ console.log("Event fired"); }, 3000);
-
-
-    setInterval(function(){ 
+    setInterval(function(){
       console.log("Une minute");
       console.log(CKEDITOR.instances.popupNotes.getData());
       notifierAlerte("notes", "notesEditor", paragrapheClique, CKEDITOR.instances.popupNotes.getData());
@@ -442,7 +342,6 @@ foreach ($notesImportees as $item){
       notifierAlerte("alert","speed",diapoVisualisee,"");
     });
 
-
     function diapoPrevious(){
       if (diapoCourante>1) {
         pageArriere();
@@ -481,7 +380,6 @@ foreach ($notesImportees as $item){
       setDirect(true);
     }
 
-
     function showPopup(element){
       $(".popup").show();
       var coordParent = $(element).offset();
@@ -489,7 +387,6 @@ foreach ($notesImportees as $item){
       $(".popup").css("left", coordParent.left + widthParent); //-30
       var haut = $("#resources_view").offset();
       $(".popup").css("top", haut.top);
-
       $(".popup").addClass("selected");
     }
 
@@ -503,7 +400,6 @@ foreach ($notesImportees as $item){
         objParagraphe.parent().css("background-color", "transparent" );
         $(element).removeClass("selected");
       } else {
-        
         objParagraphe = $(element);
         paragrapheClique = element.innerHTML;
         var souchaine = paragrapheClique.substring(0,20);
@@ -528,23 +424,20 @@ foreach ($notesImportees as $item){
     websocket.onmessage = function(evt) { onMessage(evt) };
     websocket.onerror = function(evt) { onError(evt) };
 
-  function onOpen(evt)
-  {
+  function onOpen(evt) {
     writeToScreen("CONNECTED");
     authentifie('.$USER->id.', "etudiant", '.$courseId.', '.$cm->id.');
     console.log("connection etablie");
   }
 
-  function onClose(evt)
-  {
+  function onClose(evt) {
     writeToScreen("DISCONNECTED");
   }
 
-  function onMessage(evt)
-  {
+  function onMessage(evt) {
     var message = JSON.parse(evt.data);
     switch (message.action) {
-      case "transcription" : 
+      case "transcription" :
       transcription(message.params);
       break;
       case "page" :
@@ -573,7 +466,6 @@ foreach ($notesImportees as $item){
 
   // RÉCEPTION D UN CHANGEMENT DE PAGE PAR WEBSOCKET
   function page(message) {
-    // writeToScreen(\'<span>PAGE reçue </span> \' + JSON.stringify(message, null, 4));
     console.log("PAGE reçue"+message);
     if (state_direct){
       actualiserDiapo(message["page"]);
@@ -590,14 +482,11 @@ foreach ($notesImportees as $item){
 
   // RÉCEPTION DE LA RESSOURCE
   function ressource(message) {
-    // writeToScreen(\'<span>RESSOURCE reçue </span> \' + JSON.stringify(message, null, 4));
     console.log(message);
     console.log('.$USER->id.');
-    if(message.targetid == '.$USER->id.' || '.$USER->id.' == 60 || '.$USER->id.' == 61 || message.targetid == 0){
-      
+    if(message.targetid == '.$USER->id.' || '.$USER->id.' == 60 || '.$USER->id.' == 61 || message.targetid == 0) {
       ajoutBlocRessource(message);
     }
-
   }
 
   function indicator(message) {
@@ -609,32 +498,22 @@ foreach ($notesImportees as $item){
   }
 
   // Infos en cas derreur
-  function onError(evt)
-  {
+  function onError(evt) {
     writeToScreen(\'<span style="color: red;">ERROR:</span> \' + evt.data);
   }
 
   // Envoi websocket
-  function doSend(message)
-  {
-    // writeToScreen("SENT: " + message);
+  function doSend(message) {
     websocket.send(message);
   }
 
   // Print des infos de connection/sent/reçu
-  function writeToScreen(message)
-  {
-    // output = document.getElementById("info");
-    // var pre = document.createElement("p");
-    // pre.style.wordWrap = "break-word";
-    // pre.innerHTML = message;
-    // output.appendChild(pre);
+  function writeToScreen(message) {
     console.log(message);
   }
 
   // Authentifier la personne sur le serveur moodle
-  function authentifie(userid, role, course, activity)
-  {
+  function authentifie(userid, role, course, activity) {
     user_id= userid;
     course_id = course;
     activity_id = activity;
@@ -650,7 +529,15 @@ foreach ($notesImportees as $item){
   function notifierAlerte(conteneur, obj, page, donnee) {
     var data = {
       "action" : "alerte",
-      "params" : { "user_id" : user_id, "container" : conteneur, "object":obj, "activity":activity_id, "course" : course_id, "data" : donnee, "page" : page }
+      "params" : {
+          "user_id" : user_id,
+          "container" : conteneur,
+          "object":obj,
+          "activity":activity_id,
+          "course" : course_id,
+          "data" : donnee,
+          "page" : page
+          }
     };
 
     doSend(JSON.stringify(data));
@@ -683,7 +570,7 @@ foreach ($notesImportees as $item){
 
     pre.appendChild(bloc);
     output.appendChild(pre);
-  }  
+  }
 
   function ajouterTick(coord){
     var div = document.getElementById("progressbarContenant");
@@ -699,10 +586,8 @@ foreach ($notesImportees as $item){
     document.getElementById("slides_view_next").src="'.$url_diapo.'".concat(numeroDiapo(num+1)).concat(".jpg");
   }
 
-
   function setDirect(b){
     state_direct = b;
-    //notifierAlerte("alert", "direct",0, b);
     console.log(state_direct);
     if(b===true){
       notifierAlerte("alert","repriseDirect", diapoVisualisee ,"");
@@ -837,9 +722,7 @@ foreach ($notesImportees as $item){
   }
 
   function ajoutBlocRessource(message) {
-
     if (message.mime=="ressources_externes"){
-      //$( ".scrollRessourcesInside" ).append( \'<button id="like1" class="like" onclick="like(this,0,&quot;\' + message.description + message.source + \'&quot;)">👍</button><button id="dislike1" class="like" onclick="dislike(this,0,&quot;\' + message.description + message.source + \'&quot;)">👎</button><a id="url1" class="nom_ressource" target="_blank" href="\' + message.source + \'" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("alert","ressource",1,"")>\' + message.description + \'</a><br /> \' );
       $( ".scrollRessourcesInside" ).append( \'<a id="url1" class="nom_ressource" target="_blank" href="\' + message.source + \'" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("alert","ressource",1,"")>\' + message.description + \'</a><br /> \' );
     }
     if (message.mime == "questions"){
@@ -866,11 +749,8 @@ foreach ($notesImportees as $item){
       $(this).tooltip("enable").tooltip("open");
   });
 
-
   </script>
-
-  ');
-
+');
 
 // Finish the page.
 echo $OUTPUT->footer();

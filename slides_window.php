@@ -33,32 +33,24 @@ require_once(__DIR__.'/tool_demo/output/index_page.php');
 global $DB, $CFG, $COURSE;
 
 $instanceId = optional_param('instanceid', 0, PARAM_INT);
-$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID.
 $courseId = optional_param('courseid', 0, PARAM_INT);
 $n  = optional_param('n', 0, PARAM_INT);  // ... pastel instance ID - it should be named as the first character of the module.
 
-$cours = $DB->get_record('pastel', array('id'=>$instanceId)); // PAS DUR
+$cours = $DB->get_record('pastel', array('id' => $instanceId));
 $totalDiapo = $cours->intro;;
 
 if ($id) {
-  $cm         = get_coursemodule_from_id('pastel', $id, 0, false, MUST_EXIST);
-  $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-  $pastel  = $DB->get_record('pastel', array('id' => $cm->instance), '*', MUST_EXIST);
+    $cm         = get_coursemodule_from_id('pastel', $id, 0, false, MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $pastel  = $DB->get_record('pastel', array('id' => $cm->instance), '*', MUST_EXIST);
 } else if ($n) {
-  $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
-  $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
-  $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
+    $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
+    $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
 }
 
-// require_login($course, true, $cm);
-
-// $event = \mod_pastel\event\course_module_viewed::create(array(
-//     'objectid' => $PAGE->cm->instance,
-//     'context' => $PAGE->context,
-// ));
-// $event->add_record_snapshot('course', $PAGE->course);
-// $event->add_record_snapshot($PAGE->cm->modname, $pastel);
-// $event->trigger();
+require_login($course, true, $cm);
 
 // Print the page header.
 
@@ -69,11 +61,11 @@ $PAGE->set_title(format_string($pastel->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->requires->js_call_amd('mod_pastel/pastel_scripts', 'init');
 
-$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.' AND activity='.$id.' ORDER BY id DESC limit 1');
+$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide
+                                    WHERE course='.$courseId.' AND activity='.$id.' ORDER BY id DESC limit 1');
 $nbDiapo = $lastChange->page ?: 1;
 
 $url_subname = $cours->nomdiapo;
-// SLIDES-CM-2017
 $url_diapo = "http://la-pastel.univ-lemans.fr/mod/pastel_/pix/page/".$url_subname."-page-";
 
 // Output starts here.
@@ -198,7 +190,7 @@ print('
   {
     var message = JSON.parse(evt.data);
     switch (message.action) {
-      case "transcription" : 
+      case "transcription" :
       transcription(message.params);
       break;
       // case "page" :
@@ -218,7 +210,7 @@ print('
 
   function ressource(message) {
     output = document.getElementById("ressource");
-    
+
     var pre = document.createElement("p");
     pre.style.wordWrap = "break-word";
     pre.innerHTML = message.url;
@@ -227,7 +219,7 @@ print('
 
   function indicator(message) {
     output = document.getElementById("indicator");
-    
+
     var pre = document.createElement("p");
     pre.style.wordWrap = "break-word";
     pre.innerHTML = message;
@@ -271,7 +263,13 @@ print('
   function notifierAlerte(conteneur, obj, donnee) {
     var data = {
       "action" : "alerte",
-      "params" : { "user_id" : user_id, "container" : conteneur, "object":obj, "activity":activity_id, "course" : course_id, "data" : donnee }
+      "params" : {
+          "user_id" : user_id,
+          "container" : conteneur,
+          "object":obj,
+          "activity":activity_id,
+          "course" : course_id,
+          "data" : donnee }
     };
 
     doSend(JSON.stringify(data));

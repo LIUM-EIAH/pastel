@@ -14,7 +14,7 @@
 case "$1" in
   start)
     echo "Starting websocket server "
-	/usr/bin/pastelws &
+    /usr/bin/pastelws &
     # example 1 - system service
     # /usr/bin/foobar --config /etc/foo.conf start
 
@@ -24,7 +24,7 @@ case "$1" in
     ;;
   stop)
     echo "Stopping websocket server"
-	ps aux |grep -i run.php|awk '{print $2}'|xargs sudo kill -9
+    ps aux |grep -i run.php|awk '{print $2}'|xargs sudo kill -9
 
     # example 1
     # /usr/bin/foobar --config /etc/foo.conf stop

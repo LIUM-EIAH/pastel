@@ -21,7 +21,7 @@
  * if you like, and it can span multiple lines.
  *
  * @package    mod_pastel
- * @copyright  2016 Your Name <your@email.address>
+ * @copyright  2020 LIUM
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -68,7 +68,7 @@ foreach ($roles as $role) {
 }
 $rolestr = implode(', ', $rolestr);
 
-// Format de page
+// Page format.
 $PAGE->set_pagelayout('popup');
 // Print the page header.
 $PAGE->set_url('/mod/pastel/view.php', array('id' => $cm->id));
@@ -79,22 +79,19 @@ $PAGE->set_heading(format_string($course->fullname));
 // Output starts here.
 echo $OUTPUT->header();
 
-print('Rôle détecté : ');
+echo('Rôle détecté : ' .$rolestr);
 
-print_r($rolestr);
-
-$parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id ,'sesskey' => sesskey());
+$parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id, 'sesskey' => sesskey());
 
 if (stripos($rolestr, "editingteacher") !== false ) {
-    $url_ens = new moodle_url('/mod/pastel/config2.php', $parameters);
-    redirect($url_ens);
-
+    $urlens = new moodle_url('/mod/pastel/config2.php', $parameters);
+    redirect($urlens);
 } else if (stripos($rolestr, "student") !== false ) {
-    $url_etu = new moodle_url('/mod/pastel/v3_etudiant_diapo.php', $parameters);
-    redirect($url_etu);
+    $urletu = new moodle_url('/mod/pastel/v3_etudiant_diapo.php', $parameters);
+    redirect($urletu);
 }
 
-$parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id ,'sesskey' => sesskey());
+$parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id, 'sesskey' => sesskey());
 $url = new moodle_url('/mod/pastel/exempleclient.html', $parameters);
 $label = get_string('client', 'block_showcase');
 $options = array('class' => 'overviewButton');

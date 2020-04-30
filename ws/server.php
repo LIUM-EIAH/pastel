@@ -21,7 +21,7 @@
  * @copyright  2017 Marc Leconte
  */
 
-// Require HashMap
+// Require HashMap.
 require __DIR__ . '/hash.php';
 
 use Ratchet\MessageComponentInterface;
@@ -43,22 +43,21 @@ class mod_pastel_server implements MessageComponentInterface {
         $this->connections = new HashMap ();
         echo  date("F j, Y, g:i a") .' DEMARRAGE du serveur Pastel WS ' . PHP_EOL;
     }
-    function __destruct() {
+    public function __destruct() {
         echo date("F j, Y, g:i a") . ' ARRET du serveur Pastel WS '  . PHP_EOL;
     }
     public function onOpen(ConnectionInterface $conn) {
     }
-    
-    
+
     public function onMessage(ConnectionInterface $conn, $data) {
         // Parse data received.
         echo date("F j, Y, g:i a") . $data . PHP_EOL;
-        
-        if (! $this->isValid ( $conn, $data )) {
+
+        if (! $this->isvalid ( $conn, $data )) {
             return;
         }
         $data = json_decode ( $data );
-        
+
         if (isset ( $this->connections [$conn] )) {
             $this->userid = $this->connections [$conn];
             $time = new DateTime("now", core_date::get_user_timezone_object());
@@ -67,7 +66,6 @@ class mod_pastel_server implements MessageComponentInterface {
 
         if (isset ( $data->action ) && isset ( $data->params )) {
             switch ($data->action) {
-                
                 // When a user becomes online.
                 case 'update_status' :
                     $this->update_user_status ( $conn, $data->params );
@@ -88,19 +86,20 @@ class mod_pastel_server implements MessageComponentInterface {
                         $this->unauthorisedAction($conn, $data->action);
                         break;
                     }
-                    $this->chgtPage ($conn, $data->params );
+                    $this->chgtpage ($conn, $data->params );
                     break;
-                
+
                 // When a student clicks on an alert button.
                 case 'alerte' :
                     if ($this->infos [$this->userid]->role != ROLE_ETUDIANT) {
                         $this->unauthorisedAction($conn, $data->action);
                         break;
                     }
-                    $this->notifyAlerte ( $data->params );
+                    $this->notifyalerte($data->params);
                     break;
                 case 'indicator' :
-                    if ($this->infos [$this->userid]->role != ROLE_ANALYSE && $this->infos [$this->userid]->role != ROLE_RESSOURCE) {
+                    if ($this->infos [$this->userid]->role != ROLE_ANALYSE &&
+                        $this->infos [$this->userid]->role != ROLE_RESSOURCE) {
                         $this->unauthorisedAction($conn, $data->action);
                         break;
                     }
@@ -112,7 +111,7 @@ class mod_pastel_server implements MessageComponentInterface {
                         $this->unauthorisedAction($conn, $data->action);
                         break;
                     }
-                    $this->addRessource ( $data->params );
+                    $this->addressource($data->params);
                     break;
                 // Upon receiving a Trello or Etherpad trace.
                 case 'trace' :
@@ -128,7 +127,7 @@ class mod_pastel_server implements MessageComponentInterface {
                     $response = array (
                             'action' => 'error',
                             'params' => array (
-                                    'message' => 'Action ' . $data->action . ' non implemente' 
+                                    'message' => 'Action ' . $data->action . ' non implemente'
                             )
                     );
                     $this->response ( $conn, $response );
@@ -137,7 +136,7 @@ class mod_pastel_server implements MessageComponentInterface {
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        echo "An error has occurred: {$e->getMessage()}" . PHP_EOL ;    
+        echo "An error has occurred: {$e->getMessage()}" . PHP_EOL;
         $conn->close ();
     }
 
@@ -163,25 +162,25 @@ class mod_pastel_server implements MessageComponentInterface {
         }
         $this->update_user_status ( $conn, $params );
     }
-        
+
     /**
      * Sends the message to all the targets that carry the requested role.
      */
     private function send_data_role($action, $params, $role, $filtre) {
         $data = array (
                 'action' => $action,
-                'params' => $params 
+                'params' => $params
         );
         $json = json_encode ( $data );
 
-        foreach ( $this->infos as $key => $value ) {
+        foreach ($this->infos as $key => $value) {
             $envoi = !$filtre;
             if ($filtre && $this->infos [$key]->course == $params->course && $this->infos [$key]->activity == $params->activity ) {
                 $envoi = true;
             }
 
             if ($envoi && $this->infos [$key]->role == $role) {
-                foreach ( $this->clients [$key] as $conn ) {
+                foreach ($this->clients [$key] as $conn) {
                     $conn->send ( $json );
                 }
             }
@@ -202,11 +201,11 @@ class mod_pastel_server implements MessageComponentInterface {
             $info->role = $params->role;
             $info->course = $params->course;
             $info->activity = $params->activity;
-            
+
             if (mod_pastel_update_user_status ( $params->user_id, $params->status, $info ) == false) {
                 return;
             }
-            
+
             // If Online.
             if ($params->status == 'online') {
                 // Store Connection.
@@ -226,7 +225,7 @@ class mod_pastel_server implements MessageComponentInterface {
             }
         }
     }
-    
+
     /**
      * Treatment to be carried out for each transcription received.
      *
@@ -246,8 +245,8 @@ class mod_pastel_server implements MessageComponentInterface {
         if (mod_pastel_transcription ( $this->userid, $params ) == false) {
             return;
         }
-        
-        // Target practice.
+
+        // Switching to targets.
         $this->send_data_role ( "transcription", $params, ROLE_ETUDIANT, true );
         $this->send_data_role ( "transcription", $params, ROLE_ENSEIGNANT, true );
         $this->send_data_role ( "transcription", $params, ROLE_RESSOURCE, false );
@@ -260,14 +259,12 @@ class mod_pastel_server implements MessageComponentInterface {
      * @param object $params
      *          - the data received from the client.
      */
-    private function chgtPage(ConnectionInterface $conn, $params) {
-        
-        // le numero de page du message est le numero de page courante
+    private function chgtpage(ConnectionInterface $conn, $params) {
+        // The page number of the message is the current page number.
         if (mod_pastel_chgtPage ( $this->userid, $params) == false) {
             return;
         }
-        // on recupere $numeroPageMax dans le chap intro de l'activite
-        
+
         $numero = intval($params->page);
         if ($params->navigation == 'forward') {
             $numero = $numero + 1;
@@ -285,28 +282,27 @@ class mod_pastel_server implements MessageComponentInterface {
             return;
         }
         $params->page = $numero;
-        // aiguillage sur les cibles
+        // Switching to targets.
         $this->send_data_role ( "page", $params, ROLE_ETUDIANT, true );
         $this->send_data_role ( "page", $params, ROLE_ENSEIGNANT, true );
-        $this->send_data_role ( "page", $params, ROLE_RESSOURCE,false );
+        $this->send_data_role ( "page", $params, ROLE_RESSOURCE, false );
         $this->send_data_role ( "page", $params, ROLE_ANALYSE, false );
     }
-    
+
     /**
      * Quand un etudiant emet une alerte.
      *
      * @param object $params
      *          - the data received from the client.
      */
-    private function notifyAlerte($params) {
-        //enregistrement en bdd dans la table pastel_user_event
-        if (mod_pastel_userEvent ( $this->userid, $params) == false) {
+    private function notifyalerte($params) {
+        // Database record in the table  table pastel_user_event.
+        if (mod_pastel_userEvent($this->userid, $params) == false) {
             return;
         }
         $params->user_id = $this->userid;
-        // aiguillage sur les cibles
-        //$this->send_data_role ( "alerte", $params, ROLE_ANALYSE, false );
-        if (strcmp($params->container,"alert") === 0) {
+        // Switching to targets.
+        if (strcmp($params->container, "alert") === 0) {
             $parameters = new stdClass ();
             $parameters->user_id = $this->userid;
             $parameters->timecreated = $params->timecreated;
@@ -319,16 +315,16 @@ class mod_pastel_server implements MessageComponentInterface {
         }
         $this->send_data_role ( "alerte", $params, ROLE_RESSOURCE, false );
     }
+
     private function indicator($params) {
         if (mod_pastel_indicator ( $this->userid, $params ) == false) {
             return;
         }
-        
-        // aiguillage sur les cibles
-        //$this->send_data_role ( "indicator", $params, ROLE_RESSOURCE, false );
+
+        // Switching to targets.
         $this->send_data_role ( "indicator", $params, ROLE_ENSEIGNANT, true );
     }
-    
+
     /**
      * Posts a message into a chat session and sends it to the other user in
      * that session.
@@ -336,19 +332,19 @@ class mod_pastel_server implements MessageComponentInterface {
      * @param object $params
      *          - the data received from the client.
      */
-    private function addRessource($params) {
+    private function addressource($params) {
         if (mod_pastel_addRessource ( $this->userid, $params) == false) {
             return;
         }
-        
-        // aiguillage sur les cibles
+
+        // Switching to targets.
         $this->send_data_role ( "ressource", $params, ROLE_ETUDIANT, true );
         $this->send_data_role ( "ressource", $params, ROLE_ENSEIGNANT, true );
         $this->send_data_role ( "ressource", $params, ROLE_ANALYSE, false );
     }
-    private function isValid(ConnectionInterface $conn, $message) {
+    private function isvalid(ConnectionInterface $conn, $message) {
         try {
-            // format valid ?
+            // Format valid ?
             $data = json_decode ( $message );
             if (isset ( $data->action ) == false || isset ( $data->params ) == false) {
                 $response = array ('action' => 'error',
@@ -356,13 +352,11 @@ class mod_pastel_server implements MessageComponentInterface {
                 $this->response ( $conn, $response );
                 return false;
             }
-            // first message must be update_status
+            // First message must be update_status.
             if (! isset ( $this->connections [$conn] ) && $data->action != 'update_status') {
                 $response = array (
                         'action' => 'error',
-                        'params' => array (
-                                'message' => 'Identification requise' 
-                        ) 
+                        'params' => array ('message' => 'Identification requise')
                 );
                 $this->response ( $conn, $response );
                 return false;
@@ -371,15 +365,13 @@ class mod_pastel_server implements MessageComponentInterface {
         } catch ( Exception $err ) {
             $response = array (
                     'action' => 'error',
-                    'params' => array (
-                            'message' => $err->getMessage () 
-                    ) 
+                    'params' => array ('message' => $err->getMessage ())
             );
             $this->response ( $conn, $response );
             return false;
         }
     }
-    
+
     private function response(ConnectionInterface $conn, $message) {
         try {
             $json = json_encode ( $message );

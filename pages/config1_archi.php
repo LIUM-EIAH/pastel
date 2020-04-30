@@ -42,20 +42,10 @@ if ($id) {
     $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
     $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
-// } else {
-//     error('You must specify a course_module ID or an instance ID');
 }
 
 
-// require_login($course, true, $cm);
-
-// $event = \mod_pastel\event\course_module_viewed::create(array(
-//     'objectid' => $PAGE->cm->instance,
-//     'context' => $PAGE->context,
-// ));
-// $event->add_record_snapshot('course', $PAGE->course);
-// $event->add_record_snapshot($PAGE->cm->modname, $pastel);
-// $event->trigger();
+require_login($course, true, $cm);
 
 // Print the page header.
 
@@ -100,37 +90,68 @@ print('
                     </div>
                 </div>
                 <div class="transcriptWrapper">
-                    <div class="blocTranscript"> 10:28  La transcription est étiquetée avec lheure. Bla bla bla, bla bla, bla bla bla bla. Bla bla bla, bla bla, bla bla bla bla.
+                    <div class="blocTranscript"> 10:28  La transcription est étiquetée avec lheure. Bla bla bla,
+                    bla bla, bla bla bla bla. Bla bla bla, bla bla, bla bla bla bla.
                         <span class="tooltiptext">Diapo n° X</span>
                     </div>
                 </div>
                 <div class="transcriptWrapper">
-                    <div class="blocTranscript"> 10:29  Un test plus long pour tester quand un paragraphe est plus long, bla bla bla, bla bla, bla bla bla bla. Bla bla bla, bla bla, bla bla bla bla. Bla bla bla, bla bla, bla bla bla bla.
+                    <div class="blocTranscript"> 10:29  Un test plus long pour tester quand un paragraphe est plus long,
+                    bla bla bla, bla bla, bla bla bla bla. Bla bla bla, bla bla, bla bla bla bla. Bla bla bla, bla bla,
+                    bla bla bla bla.
                         <span class="tooltiptext">Diapo n° X</span>
                     </div>
                 </div>
                 <div class="transcriptWrapper">
-                    <div class="blocTranscript"> 10:30  Généralement, on utilise un texte en faux latin (le texte ne veut rien dire, il a été modifié), le Lorem ipsum ou Lipsum, qui permet donc de faire office de texte dattente. Lavantage de le mettre en latin est que lopérateur sait au premier coup doeil que la page contenant ces lignes nest pas valide, et surtout lattention du client nest pas dérangée par le contenu, il demeure concentré seulement sur laspect graphique. Bla bla bla, bla bla, bla bla bla bla. Bla bla bla, bla bla, bla bla bla bla.
+                    <div class="blocTranscript"> 10:30  Généralement, on utilise un texte en faux latin (le texte ne
+                    veut rien dire, il a été modifié), le Lorem ipsum ou Lipsum, qui permet donc de faire office de
+                    texte dattente. Lavantage de le mettre en latin est que lopérateur sait au premier coup doeil que
+                    la page contenant ces lignes nest pas valide, et surtout lattention du client nest pas dérangée
+                    par le contenu, il demeure concentré seulement sur laspect graphique. Bla bla bla, bla bla, bla
+                    bla bla bla. Bla bla bla, bla bla, bla bla bla bla.
                         <span class="tooltiptext">Diapo n° X</span>
                     </div>
                 </div>
                 <div class="transcriptWrapper">
-                    <div class="blocTranscript"> 10:35 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <div class="blocTranscript"> 10:35 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+                    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+                    cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                         <span class="tooltiptext">Diapo n° X</span>
                     </div>
                 </div>
                 <div class="transcriptWrapper">
-                    <div class="blocTranscript"> 10:40 Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. <span class="correctif">Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</span>
+                    <div class="blocTranscript"> 10:40 Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                    accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis
+                    et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
+                    aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi
+                    nesciunt. <span class="correctif">Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet,
+                    consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam
+                    aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis
+                    suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit
+                    qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo
+                    voluptas nulla pariatur?</span>
                         <span class="tooltiptext">Diapo n° X</span>
                     </div>
                 </div>
                 <div class="transcriptWrapper">
-                    <div class="blocTranscript"> 10:50 Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. <span class="correctif">Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</span>
+                    <div class="blocTranscript"> 10:50 Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                    accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis
+                    et quasi architecto beatae vitae dicta sunt explicabo. <span class="correctif">Ut enim ad minima
+                    veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi
+                    consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae
+                    consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</span>
                         <span class="tooltiptext">Diapo n° X</span>
                     </div>
                 </div>
                 <div class="transcriptWrapper">
-                    <div class="blocTranscript"> 10:55 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <div class="blocTranscript"> 10:55 Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                    irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim
+                    id est laborum.
                         <span class="tooltiptext">Diapo n° X</span>
                     </div>
                 </div>
