@@ -41,7 +41,7 @@ class pastel_export_pdf {
         $doc->setPrintHeader(false);
         $doc->setPrintFooter(false);
 
-        $tabtempspage = $this->getNbPage();
+        $tabtempspage = $this->get_nb_page();
         if (count($tabtempspage) == 0) {
             $msg = "Activite non realise !";
             $doc->AddPage('L', 'A4');
@@ -63,7 +63,7 @@ class pastel_export_pdf {
 
             $doc->writeHTML($tbl, true, false, true, false, '');
 
-            $this->ecrireRessources($doc, $val);
+            $this->ecrire_ressources($doc, $val);
             $tbl4 = '<br/><b>Transcription</b><br/>'. $this->getTranscriptionPage($val);
             $doc->writeHTML($tbl4, true, false, true, false, '');
         }
@@ -95,11 +95,11 @@ class pastel_export_pdf {
     /**
      * Obtention des ressources d'une page.
      */
-    private function ecrireRessources($doc, $tabTemps) {
+    private function ecrire_ressources($doc, $tabtemps) {
         global $DB, $CFG;
         $doc->SetFont('times', 'U', 12, '', 'false');
         $doc->SetTextColor(0, 0, 255);
-        foreach ($tabTemps as $temps) {
+        foreach ($tabtemps as $temps) {
             if (!isset($temps->fin) || !isset($temps->debut)) {
                 continue;
             }
@@ -131,10 +131,10 @@ class pastel_export_pdf {
      * Obtention des textes de transcription de la page.
      * On recevoir le tableau des temps passes sur la page
      */
-    private function getTranscriptionPage($tabTemps) {
+    private function getTranscriptionPage($tabtemps) {
         global $DB;
         $ret = "";
-        foreach ($tabTemps as $temps) {
+        foreach ($tabtemps as $temps) {
             if (!isset($temps->fin) || !isset($temps->debut)) {
                 continue;
             }
@@ -159,11 +159,11 @@ class pastel_export_pdf {
      * Etablit la liste des pages et leur creneau de visualisation.
      * La derniere page aura une date de fin equivalente a maintenant.
      */
-    private function getNbPage() {
+    private function get_nb_page() {
         global $DB;
         $data = array ();
 
-        $maxpage = $this->getMaxPage();
+        $maxpage = $this->get_max_page();
         if ($maxpage == -1) {
             return $data;
         }
@@ -182,16 +182,16 @@ class pastel_export_pdf {
                 continue;
             }
             if (isset ($data[$numPageQuit])) {
-                $tabTemps = $data[$numPageQuit];
-                $count = count($tabTemps);
-                $tabTemps[$count - 1]->fin = $result->timecreated;
+                $tabtemps = $data[$numPageQuit];
+                $count = count($tabtemps);
+                $tabtemps[$count - 1]->fin = $result->timecreated;
             } else {
                 $temps = new stdClass ();
                 $temps->debut = null;
                 $temps->fin = $result->timecreated;
-                $tabTemps = array();
-                $tabTemps[] = $temps;
-                $data[$numPageQuit] = $tabTemps;
+                $tabtemps = array();
+                $tabtemps[] = $temps;
+                $data[$numPageQuit] = $tabtemps;
             }
 
             $temps = new stdClass ();
@@ -205,9 +205,9 @@ class pastel_export_pdf {
             if (isset ($data[$numPageArriv])) {
                 $data[$numPageArriv][] = $temps;
             } else {
-                $tabTemps = array();
-                $tabTemps[] = $temps;
-                $data[$numPageArriv] = $tabTemps;
+                $tabtemps = array();
+                $tabtemps[] = $temps;
+                $data[$numPageArriv] = $tabtemps;
             }
         }
         // Purge.
@@ -232,7 +232,7 @@ class pastel_export_pdf {
         return $data;
     }
 
-    private function getMaxPage() {
+    private function get_max_page() {
         global $DB;
         $maxpage = -1;
         try {
