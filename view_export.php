@@ -54,7 +54,7 @@ $PAGE->set_heading(format_string($course->fullname));
 
 
 $exp = new pastel_export_pdf();
-$exp->setContext($course->id, $cm->id, $USER->id);
+$exp->set_context($course->id, $cm->id, $USER->id);
 
 $exp->print_activity();
 echo $OUTPUT->footer();

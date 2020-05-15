@@ -22,7 +22,7 @@ class pastel_export_pdf {
     protected $userid;
     protected $urlsubname;
 
-    public function setContext($cid, $modid, $uid) {
+    public function set_context($cid, $modid, $uid) {
         $this->courseid = $cid;
         $this->activityid = $modid;
         $this->userid = $uid;
@@ -64,7 +64,7 @@ class pastel_export_pdf {
             $doc->writeHTML($tbl, true, false, true, false, '');
 
             $this->ecrire_ressources($doc, $val);
-            $tbl4 = '<br/><b>Transcription</b><br/>'. $this->getTranscriptionPage($val);
+            $tbl4 = '<br/><b>Transcription</b><br/>'. $this->get_transcription_page($val);
             $doc->writeHTML($tbl4, true, false, true, false, '');
         }
 
@@ -104,7 +104,7 @@ class pastel_export_pdf {
                 continue;
             }
             if ($temps->fin === null || $temps->debut === null) {
-              continue;
+                continue;
             }
             try {
                 $req = "select url, title from {pastel_resource}
@@ -131,7 +131,7 @@ class pastel_export_pdf {
      * Obtention des textes de transcription de la page.
      * On recevoir le tableau des temps passes sur la page
      */
-    private function getTranscriptionPage($tabtemps) {
+    private function get_transcription_page($tabtemps) {
         global $DB;
         $ret = "";
         foreach ($tabtemps as $temps) {
@@ -173,16 +173,16 @@ class pastel_export_pdf {
         $rs = $DB->get_recordset_sql ( $req, array ($this->courseid, $this->activityid));
 
         foreach ($rs as $result) {
-            $numPageQuit = $result->page;
-            $numPageArriv = $numPageQuit + 1;
+            $numpagequit = $result->page;
+            $numpagearriv = $numpagequit + 1;
             if (strcmp($result->navigation, "forward") !== 0 ) {
-                $numPageArriv = $numPageQuit - 1;
+                $numpagearriv = $numpagequit - 1;
             }
-            if ($numPageArriv > $maxpage || $numPageArriv < 1) {
+            if ($numpagearriv > $maxpage || $numpagearriv < 1) {
                 continue;
             }
-            if (isset ($data[$numPageQuit])) {
-                $tabtemps = $data[$numPageQuit];
+            if (isset ($data[$numpagequit])) {
+                $tabtemps = $data[$numpagequit];
                 $count = count($tabtemps);
                 $tabtemps[$count - 1]->fin = $result->timecreated;
             } else {
@@ -191,40 +191,40 @@ class pastel_export_pdf {
                 $temps->fin = $result->timecreated;
                 $tabtemps = array();
                 $tabtemps[] = $temps;
-                $data[$numPageQuit] = $tabtemps;
+                $data[$numpagequit] = $tabtemps;
             }
 
             $temps = new stdClass ();
             $temps->debut = $result->timecreated + 1;
-            if ($numPageArriv == $maxpage) {
+            if ($numpagearriv == $maxpage) {
                 $temps->fin = $now;
             } else {
                 $temps->fin = null;
             }
 
-            if (isset ($data[$numPageArriv])) {
-                $data[$numPageArriv][] = $temps;
+            if (isset ($data[$numpagearriv])) {
+                $data[$numpagearriv][] = $temps;
             } else {
                 $tabtemps = array();
                 $tabtemps[] = $temps;
-                $data[$numPageArriv] = $tabtemps;
+                $data[$numpagearriv] = $tabtemps;
             }
         }
         // Purge.
         foreach ($data as $key => $val) {
-            $tempsPage = $data[$key];
-            foreach ($tempsPage as $ind => $plage) {
+            $tempspage = $data[$key];
+            foreach ($tempspage as $ind => $plage) {
                 if (!isset($plage->fin)) {
-                    unset ($tempsPage[$ind]);
+                    unset ($tempspage[$ind]);
                     continue;
                 }
                 if (!isset($plage->debut)) {
-                    unset ($tempsPage[$ind]);
+                    unset ($tempspage[$ind]);
                 } else if (isset($plage->fin) &&  $plage->debut > $plage->fin ) {
-                    unset ($tempsPage[$ind]);
+                    unset ($tempspage[$ind]);
                 }
             }
-            if (count($tempsPage) == 0) {
+            if (count($tempspage) == 0) {
                 unset($data[$key]);
             }
         }
@@ -236,8 +236,8 @@ class pastel_export_pdf {
         global $DB;
         $maxpage = -1;
         try {
-            $reqInstance = "select instance from {course_modules} where id = ". $this->activityid;
-            $instance = $DB->get_record_sql($reqInstance, array());
+            $reqinstance = "select instance from {course_modules} where id = ". $this->activityid;
+            $instance = $DB->get_record_sql($reqinstance, array());
             $req = "select intro from {pastel} where id = " . $instance->instance;
             $description = $DB->get_record_sql($req, array());
             $maxpage = intval(trim($description->intro));
