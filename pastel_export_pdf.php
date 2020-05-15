@@ -17,24 +17,18 @@
 defined('MOODLE_INTERNAL') || die;
 
 class pastel_export_pdf {
-    protected $courseID;
-    protected $activityID;
-    protected $userID;
-    protected $url_subname;
+    protected $courseid;
+    protected $activityid;
+    protected $userid;
+    protected $urlsubname;
 
     public function setContext($cid, $modid, $uid) {
-        $this->courseID = $cid;
-        $this->activityID = $modid;
-        $this->userID = $uid;
+        $this->courseid = $cid;
+        $this->activityid = $modid;
+        $this->userid = $uid;
         global $DB;
-        $cours = $DB->get_record('pastel', array('course' => $this->courseID));
-        $this->url_subname = $cours->nomdiapo;
-        
-        /* donnees de test a supprimer
-        $this->courseID = 26;
-        $this->activityID = 300;
-        $this->userID = 58;
-        */
+        $cours = $DB->get_record('pastel', array('course' => $this->courseid));
+        $this->urlsubname = $cours->nomdiapo;
     }
     /**
      * Construit le pdf et le place dans le navigateur.
@@ -47,8 +41,8 @@ class pastel_export_pdf {
         $doc->setPrintHeader(false);
         $doc->setPrintFooter(false);
 
-        $TabTempsPage = $this->getNbPage();
-        if (count($TabTempsPage) == 0) {
+        $tabtempspage = $this->getNbPage();
+        if (count($tabtempspage) == 0) {
             $msg = "Activite non realise !";
             $doc->AddPage('L', 'A4');
             $doc->writeHTML($msg, true, false, true, false, '');
@@ -56,19 +50,15 @@ class pastel_export_pdf {
             exit;
         }
 
-        foreach ($TabTempsPage as $key => $val) {
-            $numeroPage = $key;
+        foreach ($tabtempspage as $key => $val) {
+            $numeropage = $key;
 
             $doc->AddPage('L', 'A4');
 
-            $nomImage = $CFG->wwwroot . '/mod/' . sprintf("pastel_/pix/page/".$this->url_subname."-page-%'.03d.jpg" , $numeroPage);
-
-            $debugage = '<br/>cours = ' . $this->courseID . ' activite =' . $this->activityID . ' user = '. $this->userID
-                . ' timecreated = ' . $val[0]->debut
-                . '<br/>Numero slide ' . $numeroPage . ' / Nombre de slide ' . count($TabTempsPage);
+            $nomimage = $CFG->wwwroot . '/mod/' . sprintf("pastel_/pix/page/".$this->urlsubname."-page-%'.03d.jpg" , $numeropage);
 
             $tbl = '<table><tr><td>'
-                .'<img src="' . $nomImage . '" alt="test alt attribute" width="400" height="300" border="0"/> </td>'
+                .'<img src="' . $nomimage . '" alt="test alt attribute" width="400" height="300" border="0"/> </td>'
                 .'</tr></table><br><b>Ressources</b>';
 
             $doc->writeHTML($tbl, true, false, true, false, '');
@@ -79,7 +69,7 @@ class pastel_export_pdf {
         }
 
         $doc->AddPage('L', 'A4');
-        $tbl2 = '<b>Notes</b></br>'. $this->getNotesPage($numeroPage);
+        $tbl2 = '<b>Notes</b></br>'. $this->get_notes_page($numeropage);
         $doc->writeHTML($tbl2, true, false, true, false, '');
 
         $doc->Output('pastel.pdf', 'I');
@@ -89,17 +79,17 @@ class pastel_export_pdf {
     /**
      * Obtention des notes pour une page.
      */
-    private function getNotesPage($numeroPage) {
+    private function get_notes_page($numeropage) {
         global $DB;
         $ret = "";
-        $tabInter = [];
-        $req = "select data from {pastel_user_event} 
-                where course = ? and activity = ? and container = 'notes' and user_id = ?";
-        $rs = $DB->get_recordset_sql($req, array ($this->courseID, $this->activityID, $this->userID));
+        $tabinter = [];
+        $req = "select data from {pastel_user_event}
+                where course = ? and activity = ? and container = 'notes' and user_id = ? and page = ?";
+        $rs = $DB->get_recordset_sql($req, array ($this->courseid, $this->activityid, $this->userid, $numeropage));
         foreach ($rs as $result) {
-            $tabInter[] = $result->data;
+            $tabinter[] = $result->data;
         }
-        $ret = end($tabInter);
+        $ret = end($tabinter);
         return $ret;
     }
     /**
@@ -114,16 +104,16 @@ class pastel_export_pdf {
                 continue;
             }
             if ($temps->fin === null || $temps->debut === null) {
-              continue;  
+              continue;
             }
             try {
                 $req = "select url, title from {pastel_resource}
-                        where course = ? 
-                          and activity = ? 
-                          and url like 'http%' 
-                          and timecreated >= ? and timecreated <= ? 
+                        where course = ?
+                          and activity = ?
+                          and url like 'http%'
+                          and timecreated >= ? and timecreated <= ?
                           and mime='auto'";
-                $rs = $DB->get_recordset_sql ( $req, array ($this->courseID, $this->activityID, $temps->debut, $temps->fin));
+                $rs = $DB->get_recordset_sql ( $req, array ($this->courseid, $this->activityid, $temps->debut, $temps->fin));
                 foreach ($rs as $result) {
                     $doc->Write(0, $result->title, $result->url, false, 'L', true);
                 }
@@ -156,7 +146,7 @@ class pastel_export_pdf {
 
             $req = "select text from {pastel_transcription}
                      where course = ? and activity = ? and timecreated >= ? and timecreated <= ?";
-            $rs = $DB->get_recordset_sql ( $req, array ($this->courseID, $this->activityID, $temps->debut, $temps->fin));
+            $rs = $DB->get_recordset_sql ( $req, array ($this->courseid, $this->activityid, $temps->debut, $temps->fin));
 
             foreach ($rs as $result) {
                 $ret = $ret . " " . $result->text;
@@ -180,7 +170,7 @@ class pastel_export_pdf {
 
         $now = new DateTime ( "now", core_date::get_user_timezone_object () );
         $req = "select timecreated, navigation, page from {pastel_slide} where course = ? and activity = ?";
-        $rs = $DB->get_recordset_sql ( $req, array ($this->courseID, $this->activityID));
+        $rs = $DB->get_recordset_sql ( $req, array ($this->courseid, $this->activityid));
 
         foreach ($rs as $result) {
             $numPageQuit = $result->page;
@@ -246,7 +236,7 @@ class pastel_export_pdf {
         global $DB;
         $maxpage = -1;
         try {
-            $reqInstance = "select instance from {course_modules} where id = ". $this->activityID;
+            $reqInstance = "select instance from {course_modules} where id = ". $this->activityid;
             $instance = $DB->get_record_sql($reqInstance, array());
             $req = "select intro from {pastel} where id = " . $instance->instance;
             $description = $DB->get_record_sql($req, array());
