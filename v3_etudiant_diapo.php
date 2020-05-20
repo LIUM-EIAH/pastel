@@ -30,12 +30,11 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 require_once(__DIR__.'/tool_demo/output/index_page.php');
-global $DB, $COURSE, $CFG, $USER;
+global $DB, $CFG, $USER;
 
-$instanceId = optional_param('instanceid', 0, PARAM_INT);
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID
 $n  = optional_param('n', 0, PARAM_INT);  // Pastel instance ID.
-$courseId = optional_param('courseid', 0, PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
 
 if ($id) {
     $cm      = get_coursemodule_from_id('pastel', $id, 0, false, MUST_EXIST);
@@ -47,22 +46,22 @@ if ($id) {
     $cm      = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
 }
 
-$cours = $DB->get_record('pastel', array('id' => $instanceId));
-$totalDiapo = $cours->intro;
-$adresseStream = $cours->stream;
+$cours = $DB->get_record('pastel', array('id' => $courseid));
+$totaldiapo = $cours->intro; // Non utilise !!
+$adressestream = $cours->stream;
 $beginning = $cours->timedebut;
 
 $slides = $DB->get_records_sql('SELECT * FROM {pastel_slide} WHERE activity = '.$id.' AND timecreated > '.$beginning);
 $transcription = $DB->get_records_sql('SELECT * FROM {pastel_transcription}
                                         WHERE activity = '.$id.' AND timecreated > '.$beginning);
-$notesImportees = $DB->get_records_sql('SELECT * FROM {pastel_user_event}
+$notesimportees = $DB->get_records_sql('SELECT * FROM {pastel_user_event}
                                         WHERE user_id = '.$USER->id.' AND activity = '.$id.
                                         ' AND object = "notesEditor" AND timecreated >'.$beginning);
-$notes = $notesImportees->data;
+$notes = $notesimportees->data;
 $changements = $DB->get_records_sql('SELECT timecreated, page FROM {pastel_slide}
-                                    WHERE course = '.$courseId.' AND activity = '.$id);
-$url_subname = $cours->nomdiapo;
-$url_diapo = "http://la-pastel.univ-lemans.fr/mod/pastel_/pix/page/".$url_subname."-page-";
+                                    WHERE course = '.$courseid.' AND activity = '.$id);
+$urlsubname = $cours->nomdiapo;
+$urldiapo = "http://la-pastel.univ-lemans.fr/mod/pastel_/pix/page/".$urlsubname."-page-";
 require_login($course, true, $cm);
 
 // Print the page header.
@@ -76,9 +75,9 @@ $PAGE->requires->js_call_amd('mod_pastel/pastel_scripts', 'init');
 // Output starts here.
 echo $OUTPUT->header();
 
-$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.
+$lastchange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseid.
         ' AND activity='.$id.' ORDER BY id DESC limit 1');
-$nbDiapo = $lastChange->page ?: 1;
+$nbdiapo = $lastchange->page ?: 1;
 
 print('<script src="ckeditor/ckeditor.js"></script>
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -95,10 +94,10 @@ print('<script src="ckeditor/ckeditor.js"></script>
     </div>
 
     <div class="divGauche">
-      <a href="' . $CFG->wwwroot . '/course/view.php?id=' . $courseId . '">Retour</a> <span id="info"> </span>
+      <a href="' . $CFG->wwwroot . '/course/view.php?id=' . $courseid . '">Retour</a> <span id="info"> </span>
       <button onclick="cacherGauche()"><</button>
       <iframe class="video" width="100%"
-          src="'.$adresseStream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0"
+          src="'.$adressestream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0"
           frameborder="0" allowfullscreen>
       </iframe>
 
@@ -141,7 +140,7 @@ print('<script src="ckeditor/ckeditor.js"></script>
     </div>
 
     <div class="divCentre flexVertical">
-      <img id="slides_view" src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo).'.jpg" class="diapositive diapoPetite">
+      <img id="slides_view" src="'.$urldiapo.sprintf("%'.03d\n", $nbdiapo).'.jpg" class="diapositive diapoPetite">
       <button class="needInfo" id="alert_difficulty" class="buttonInformation"
             onclick="notifierAlerte(\'alert\',\'difficulty\', diapoVisualisee ,\'\')">
         Besoin de plus d\'information
@@ -150,15 +149,15 @@ print('<script src="ckeditor/ckeditor.js"></script>
       <div class="navigation">
         <span id="link_beginning" onclick="diapoFirst()" class="survolMain"> << </span>
         <img id="slides_view_prec" class="hidden"
-            src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo - 1).'.jpg" class="PASTELpreview elementFlex">
+            src="'.$urldiapo.sprintf("%'.03d\n", $nbdiapo - 1).'.jpg" class="PASTELpreview elementFlex">
         <span id="link_previous" onclick="diapoPrevious();" class="survolMain"> < </span>
         <form style="padding-top:20px">
           <input type="text" id="num_Diapo" autocomplete="off" name="num_Diapo"
-                value="'.$nbDiapo.'" style="width:30px;"> <span>/</span><span class="max">'.$nbDiapo.'</span>
+                value="'.$nbdiapo.'" style="width:30px;"> <span>/</span><span class="max">'.$nbdiapo.'</span>
         </form>
         <span id="link_next" class="survolMain" onclick="diapoNext();"> > </span>
         <img id="slides_view_next" class="hidden"
-             src="'.$url_diapo.sprintf("%'.03d\n", $nbDiapo + 1).'.jpg" class="PASTELpreview elementFlex">
+             src="'.$urldiapo.sprintf("%'.03d\n", $nbdiapo + 1).'.jpg" class="PASTELpreview elementFlex">
         <span id="link_last" class="survolMain" onclick="diapoLast()"> >> </span>
       </div>
 
@@ -229,7 +228,7 @@ print('</div>
     var pourcentage ;
     var offset ;
 
-    var diapoCourante = '.$nbDiapo.';
+    var diapoCourante = '.$nbdiapo.';
     var diapoVisualisee = diapoCourante;
     var diapoMax = diapoVisualisee;
 
@@ -261,7 +260,7 @@ foreach ($changements as $item) {
     );}');
 }
 
-foreach ($notesImportees as $item) {
+foreach ($notesimportees as $item) {
     print('
     stockNotes['.$item->page.'] = "'.$item->data.'";');
 }
@@ -426,7 +425,7 @@ print('
 
   function onOpen(evt) {
     writeToScreen("CONNECTED");
-    authentifie('.$USER->id.', "etudiant", '.$courseId.', '.$cm->id.');
+    authentifie('.$USER->id.', "etudiant", '.$courseid.', '.$cm->id.');
     console.log("connection etablie");
   }
 
@@ -581,9 +580,9 @@ print('
   }
 
   function actualiserDiapo(num){
-    document.getElementById("slides_view").src="'.$url_diapo.'".concat(numeroDiapo(num)).concat(".jpg");
-    document.getElementById("slides_view_prec").src="'.$url_diapo.'".concat(numeroDiapo(num-1)).concat(".jpg");
-    document.getElementById("slides_view_next").src="'.$url_diapo.'".concat(numeroDiapo(num+1)).concat(".jpg");
+    document.getElementById("slides_view").src="'.$urldiapo.'".concat(numeroDiapo(num)).concat(".jpg");
+    document.getElementById("slides_view_prec").src="'.$urldiapo.'".concat(numeroDiapo(num-1)).concat(".jpg");
+    document.getElementById("slides_view_next").src="'.$urldiapo.'".concat(numeroDiapo(num+1)).concat(".jpg");
   }
 
   function setDirect(b){
@@ -593,7 +592,7 @@ print('
       notifierAlerte("alert","repriseDirect", diapoVisualisee ,"");
       diapoVisualisee = diapoCourante;
       var n = numeroDiapo(diapoCourante);
-      document.getElementById("slides_view").src="'.$url_diapo.'" + n + ".jpg";
+      document.getElementById("slides_view").src="'.$urldiapo.'" + n + ".jpg";
     } else {
       notifierAlerte("alerte", "direct", 0, "");
     }
@@ -723,11 +722,20 @@ print('
 
   function ajoutBlocRessource(message) {
     if (message.mime=="ressources_externes"){
-      $( ".scrollRessourcesInside" ).append( \'<a id="url1" class="nom_ressource" target="_blank" href="\' + message.source + \'" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("alert","ressource",1,"")>\' + message.description + \'</a><br /> \' );
+      $( ".scrollRessourcesInside" ).append( \'<a id="url1" class="nom_ressource" target="_blank" href="\'
+            + message.source + \'" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("alert","ressource",1,"")>\'
+            + message.description + \'</a><br /> \' );
     }
     if (message.mime == "questions"){
-      $( ".scrollRessourcesInside" ).append( \'<button id="like1" class="like" onclick="like(this,0,&quot;\' + message.description + message.source + \'&quot;)">👍</button><button id="dislike1" class="like" onclick="dislike(this,0,&quot;\' + message.description + message.source + \'&quot;)">👎</button><a id="url1" class="nom_ressource" target="_blank" href="\' + message.source + \'" style="font-weight: bold;margin-left:10px;color:#3c763d;" onclick="notifierAlerte("alert","ressource",1,"\' + message.description + \'")>\' + message.description + \'</a><br /> \' );
-      $( ".scrollRessourcesInside" ).append(\'<a id="url1" target="_blank" href="\' + message.source + \'" style="font-weight: normal;margin-left:10px;color:black;" onclick="notifierAlerte("alert","ressource",1,"\' + message.description + \'")><i>\' + message.title +\' </i></a><br/>\');
+      $( ".scrollRessourcesInside" ).append( \'<button id="like1" class="like" onclick="like(this,0,&quot;\'
+            + message.description + message.source + \'&quot;)">👍</button><button id="dislike1" class="like"
+            onclick="dislike(this,0,&quot;\' + message.description + message.source + \'&quot;)">👎</button>
+            <a id="url1" class="nom_ressource" target="_blank" href="\' + message.source + \'"
+            style="font-weight: bold;margin-left:10px;color:#3c763d;" onclick="notifierAlerte("alert","ressource",1,"\'
+            + message.description + \'")>\' + message.description + \'</a><br /> \' );
+      $( ".scrollRessourcesInside" ).append(\'<a id="url1" target="_blank" href="\' + message.source + \'"
+            style="font-weight: normal;margin-left:10px;color:black;" onclick="notifierAlerte("alert","ressource",1,"\'
+            + message.description + \'")><i>\' + message.title +\' </i></a><br/>\');
       $( ".scrollRessourcesInside" ).append("<br/>");
     }
     $(".scrollRessourcesInside").scrollTo("100%");

@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_pastel';
-$plugin->version  = 2020043003;
+$plugin->version  = 2020052003;
 $plugin->release  = 'v1.0';
 $plugin->requires = 2014051200;
 $plugin->maturity = MATURITY_STABLE;
