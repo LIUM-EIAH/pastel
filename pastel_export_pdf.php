@@ -17,24 +17,18 @@
 defined('MOODLE_INTERNAL') || die;
 
 class pastel_export_pdf {
-    protected $courseID;
-    protected $activityID;
-    protected $userID;
-    protected $url_subname;
+    protected $courseid;
+    protected $activityid;
+    protected $userid;
+    protected $urlsubname;
 
-    public function setContext($cid, $modid, $uid) {
-        $this->courseID = $cid;
-        $this->activityID = $modid;
-        $this->userID = $uid;
+    public function set_context($cid, $modid, $uid) {
+        $this->courseid = $cid;
+        $this->activityid = $modid;
+        $this->userid = $uid;
         global $DB;
-        $cours = $DB->get_record('pastel', array('course' => $this->courseID));
-        $this->url_subname = $cours->nomdiapo;
-        
-        /* donnees de test a supprimer
-        $this->courseID = 26;
-        $this->activityID = 300;
-        $this->userID = 58;
-        */
+        $cours = $DB->get_record('pastel', array('course' => $this->courseid));
+        $this->urlsubname = $cours->nomdiapo;
     }
     /**
      * Construit le pdf et le place dans le navigateur.
@@ -47,8 +41,8 @@ class pastel_export_pdf {
         $doc->setPrintHeader(false);
         $doc->setPrintFooter(false);
 
-        $TabTempsPage = $this->getNbPage();
-        if (count($TabTempsPage) == 0) {
+        $tabtempspage = $this->get_nb_page();
+        if (count($tabtempspage) == 0) {
             $msg = "Activite non realise !";
             $doc->AddPage('L', 'A4');
             $doc->writeHTML($msg, true, false, true, false, '');
@@ -56,30 +50,26 @@ class pastel_export_pdf {
             exit;
         }
 
-        foreach ($TabTempsPage as $key => $val) {
-            $numeroPage = $key;
+        foreach ($tabtempspage as $key => $val) {
+            $numeropage = $key;
 
             $doc->AddPage('L', 'A4');
 
-            $nomImage = $CFG->wwwroot . '/mod/' . sprintf("pastel_/pix/page/".$this->url_subname."-page-%'.03d.jpg" , $numeroPage);
-
-            $debugage = '<br/>cours = ' . $this->courseID . ' activite =' . $this->activityID . ' user = '. $this->userID
-                . ' timecreated = ' . $val[0]->debut
-                . '<br/>Numero slide ' . $numeroPage . ' / Nombre de slide ' . count($TabTempsPage);
+            $nomimage = $CFG->wwwroot . '/mod/' . sprintf("pastel_/pix/page/".$this->urlsubname."-page-%'.03d.jpg" , $numeropage);
 
             $tbl = '<table><tr><td>'
-                .'<img src="' . $nomImage . '" alt="test alt attribute" width="400" height="300" border="0"/> </td>'
+                .'<img src="' . $nomimage . '" alt="test alt attribute" width="400" height="300" border="0"/> </td>'
                 .'</tr></table><br><b>Ressources</b>';
 
             $doc->writeHTML($tbl, true, false, true, false, '');
 
-            $this->ecrireRessources($doc, $val);
-            $tbl4 = '<br/><b>Transcription</b><br/>'. $this->getTranscriptionPage($val);
+            $this->ecrire_ressources($doc, $val);
+            $tbl4 = '<br/><b>Transcription</b><br/>'. $this->get_transcription_page($val);
             $doc->writeHTML($tbl4, true, false, true, false, '');
         }
 
         $doc->AddPage('L', 'A4');
-        $tbl2 = '<b>Notes</b></br>'. $this->getNotesPage($numeroPage);
+        $tbl2 = '<b>Notes</b></br>'. $this->get_notes_page($numeropage);
         $doc->writeHTML($tbl2, true, false, true, false, '');
 
         $doc->Output('pastel.pdf', 'I');
@@ -89,41 +79,41 @@ class pastel_export_pdf {
     /**
      * Obtention des notes pour une page.
      */
-    private function getNotesPage($numeroPage) {
+    private function get_notes_page($numeropage) {
         global $DB;
         $ret = "";
-        $tabInter = [];
-        $req = "select data from {pastel_user_event} 
-                where course = ? and activity = ? and container = 'notes' and user_id = ?";
-        $rs = $DB->get_recordset_sql($req, array ($this->courseID, $this->activityID, $this->userID));
+        $tabinter = [];
+        $req = "select data from {pastel_user_event}
+                where course = ? and activity = ? and container = 'notes' and user_id = ? and page = ?";
+        $rs = $DB->get_recordset_sql($req, array ($this->courseid, $this->activityid, $this->userid, $numeropage));
         foreach ($rs as $result) {
-            $tabInter[] = $result->data;
+            $tabinter[] = $result->data;
         }
-        $ret = end($tabInter);
+        $ret = end($tabinter);
         return $ret;
     }
     /**
      * Obtention des ressources d'une page.
      */
-    private function ecrireRessources($doc, $tabTemps) {
+    private function ecrire_ressources($doc, $tabtemps) {
         global $DB, $CFG;
         $doc->SetFont('times', 'U', 12, '', 'false');
         $doc->SetTextColor(0, 0, 255);
-        foreach ($tabTemps as $temps) {
+        foreach ($tabtemps as $temps) {
             if (!isset($temps->fin) || !isset($temps->debut)) {
                 continue;
             }
             if ($temps->fin === null || $temps->debut === null) {
-              continue;  
+                continue;
             }
             try {
                 $req = "select url, title from {pastel_resource}
-                        where course = ? 
-                          and activity = ? 
-                          and url like 'http%' 
-                          and timecreated >= ? and timecreated <= ? 
+                        where course = ?
+                          and activity = ?
+                          and url like 'http%'
+                          and timecreated >= ? and timecreated <= ?
                           and mime='auto'";
-                $rs = $DB->get_recordset_sql ( $req, array ($this->courseID, $this->activityID, $temps->debut, $temps->fin));
+                $rs = $DB->get_recordset_sql ( $req, array ($this->courseid, $this->activityid, $temps->debut, $temps->fin));
                 foreach ($rs as $result) {
                     $doc->Write(0, $result->title, $result->url, false, 'L', true);
                 }
@@ -141,10 +131,10 @@ class pastel_export_pdf {
      * Obtention des textes de transcription de la page.
      * On recevoir le tableau des temps passes sur la page
      */
-    private function getTranscriptionPage($tabTemps) {
+    private function get_transcription_page($tabtemps) {
         global $DB;
         $ret = "";
-        foreach ($tabTemps as $temps) {
+        foreach ($tabtemps as $temps) {
             if (!isset($temps->fin) || !isset($temps->debut)) {
                 continue;
             }
@@ -156,7 +146,7 @@ class pastel_export_pdf {
 
             $req = "select text from {pastel_transcription}
                      where course = ? and activity = ? and timecreated >= ? and timecreated <= ?";
-            $rs = $DB->get_recordset_sql ( $req, array ($this->courseID, $this->activityID, $temps->debut, $temps->fin));
+            $rs = $DB->get_recordset_sql ( $req, array ($this->courseid, $this->activityid, $temps->debut, $temps->fin));
 
             foreach ($rs as $result) {
                 $ret = $ret . " " . $result->text;
@@ -169,72 +159,72 @@ class pastel_export_pdf {
      * Etablit la liste des pages et leur creneau de visualisation.
      * La derniere page aura une date de fin equivalente a maintenant.
      */
-    private function getNbPage() {
+    private function get_nb_page() {
         global $DB;
         $data = array ();
 
-        $maxpage = $this->getMaxPage();
+        $maxpage = $this->get_max_page();
         if ($maxpage == -1) {
             return $data;
         }
 
         $now = new DateTime ( "now", core_date::get_user_timezone_object () );
         $req = "select timecreated, navigation, page from {pastel_slide} where course = ? and activity = ?";
-        $rs = $DB->get_recordset_sql ( $req, array ($this->courseID, $this->activityID));
+        $rs = $DB->get_recordset_sql ( $req, array ($this->courseid, $this->activityid));
 
         foreach ($rs as $result) {
-            $numPageQuit = $result->page;
-            $numPageArriv = $numPageQuit + 1;
+            $numpagequit = $result->page;
+            $numpagearriv = $numpagequit + 1;
             if (strcmp($result->navigation, "forward") !== 0 ) {
-                $numPageArriv = $numPageQuit - 1;
+                $numpagearriv = $numpagequit - 1;
             }
-            if ($numPageArriv > $maxpage || $numPageArriv < 1) {
+            if ($numpagearriv > $maxpage || $numpagearriv < 1) {
                 continue;
             }
-            if (isset ($data[$numPageQuit])) {
-                $tabTemps = $data[$numPageQuit];
-                $count = count($tabTemps);
-                $tabTemps[$count - 1]->fin = $result->timecreated;
+            if (isset ($data[$numpagequit])) {
+                $tabtemps = $data[$numpagequit];
+                $count = count($tabtemps);
+                $tabtemps[$count - 1]->fin = $result->timecreated;
             } else {
                 $temps = new stdClass ();
                 $temps->debut = null;
                 $temps->fin = $result->timecreated;
-                $tabTemps = array();
-                $tabTemps[] = $temps;
-                $data[$numPageQuit] = $tabTemps;
+                $tabtemps = array();
+                $tabtemps[] = $temps;
+                $data[$numpagequit] = $tabtemps;
             }
 
             $temps = new stdClass ();
             $temps->debut = $result->timecreated + 1;
-            if ($numPageArriv == $maxpage) {
+            if ($numpagearriv == $maxpage) {
                 $temps->fin = $now;
             } else {
                 $temps->fin = null;
             }
 
-            if (isset ($data[$numPageArriv])) {
-                $data[$numPageArriv][] = $temps;
+            if (isset ($data[$numpagearriv])) {
+                $data[$numpagearriv][] = $temps;
             } else {
-                $tabTemps = array();
-                $tabTemps[] = $temps;
-                $data[$numPageArriv] = $tabTemps;
+                $tabtemps = array();
+                $tabtemps[] = $temps;
+                $data[$numpagearriv] = $tabtemps;
             }
         }
         // Purge.
         foreach ($data as $key => $val) {
-            $tempsPage = $data[$key];
-            foreach ($tempsPage as $ind => $plage) {
+            $tempspage = $data[$key];
+            foreach ($tempspage as $ind => $plage) {
                 if (!isset($plage->fin)) {
-                    unset ($tempsPage[$ind]);
+                    unset ($tempspage[$ind]);
                     continue;
                 }
                 if (!isset($plage->debut)) {
-                    unset ($tempsPage[$ind]);
+                    unset ($tempspage[$ind]);
                 } else if (isset($plage->fin) &&  $plage->debut > $plage->fin ) {
-                    unset ($tempsPage[$ind]);
+                    unset ($tempspage[$ind]);
                 }
             }
-            if (count($tempsPage) == 0) {
+            if (count($tempspage) == 0) {
                 unset($data[$key]);
             }
         }
@@ -242,12 +232,12 @@ class pastel_export_pdf {
         return $data;
     }
 
-    private function getMaxPage() {
+    private function get_max_page() {
         global $DB;
         $maxpage = -1;
         try {
-            $reqInstance = "select instance from {course_modules} where id = ". $this->activityID;
-            $instance = $DB->get_record_sql($reqInstance, array());
+            $reqinstance = "select instance from {course_modules} where id = ". $this->activityid;
+            $instance = $DB->get_record_sql($reqinstance, array());
             $req = "select intro from {pastel} where id = " . $instance->instance;
             $description = $DB->get_record_sql($req, array());
             $maxpage = intval(trim($description->intro));

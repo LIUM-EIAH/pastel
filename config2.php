@@ -32,10 +32,10 @@ require_once(__DIR__.'/tool_demo/output/index_page.php');
 global $DB, $CFG, $COURSE;
 
 // Configure les numeros de cours, de plugins, etc. d'apres les arguments passes en URL.
-$instanceId = optional_param('instanceid', 0, PARAM_INT);
+$instanceid = optional_param('instanceid', 0, PARAM_INT);
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID.
 $n  = optional_param('n', 0, PARAM_INT);  // Pastel instance ID.
-$courseId = optional_param('courseid', 0, PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
 
 // Gestion des erreurs dans les arguments.
 if ($id) {
@@ -49,28 +49,15 @@ if ($id) {
 }
 
 // Parametres du cours permettant de controler les diapos.
-$cours = $DB->get_record('pastel', array('id' => $instanceId));
-$totalDiapo = $cours->intro;
-$adresseStream = $cours->stream;
+$cours = $DB->get_record('pastel', array('id' => $instanceid));
+$urlstream = $cours->stream;
 
 // Fetch les alertes de vitesse deja envoyees.
-$indicateurs = $DB->get_records('pastel_user_event', array('course' => $courseId, 'activity' => $id, 'nature' => 'vitesse'));
-$relevantTime = time() - 600;
-$indicateurs2 = $DB->get_records_sql('SELECT * FROM {pastel_user_event} WHERE course = '.$courseId.
-    ' AND activity = '.$id.' AND object = "speed" AND timecreated >= '.$relevantTime.' GROUP BY user_id');
-$compteIndicateurs = count((array)$indicateurs2);
-// La jointure est faite pour pouvoir retrouver l'ID d'un etudiant connecte et pouvoir l'identifier.
-$usersConnectes = $DB->get_records_sql('SELECT t1.* FROM mdl_pastel_connection t1
-  JOIN (SELECT user_id, MAX(timecreated) timecreated FROM mdl_pastel_connection
-  WHERE timecreated>1510000000 AND role="etudiant" GROUP BY user_id) t2
-    ON t1.user_id = t2.user_id AND t1.timecreated = t2.timecreated;');
-$compteConnectes = count((array)$usersConnectes);
+$indicateurs = $DB->get_records('pastel_user_event', array('course' => $courseid, 'activity' => $id, 'nature' => 'vitesse'));
+$relevanttime = time() - 600;
+$indicateurs2 = $DB->get_records_sql('SELECT * FROM {pastel_user_event} WHERE course = '.$courseid.
+    ' AND activity = '.$id.' AND object = "speed" AND timecreated >= '.$relevanttime.' GROUP BY user_id');
 
-
-// Fetch le nombre de personnes connectees.
-$connectes = $DB->get_records_sql('SELECT * FROM {pastel_connection} WHERE course = '.$courseId.
-            ' AND activity = '.$id.' GROUP BY user_id');
-$nbConnectes = count((array)$connectes);
 require_login($course, true, $cm);
 
 // Definit le format de la page Moodle, POPUP a ete choisi pour ne pas avoir de marge ou de hearder instrusif.
@@ -86,10 +73,10 @@ $PAGE->requires->js_call_amd('mod_pastel/pastel_scripts', 'init');
 echo $OUTPUT->header();
 
 // Chercher l'entree BDD concernant le dernier changement de page.
-$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.' AND activity='.$id.
+$lastchange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseid.' AND activity='.$id.
             ' ORDER BY id DESC limit 1');
 // Chercher le numero de la derniere diapo affichee (si aucune n'est enregistree on prend le numero 1).
-$nbDiapo = $lastChange->page ?: 1;
+$nbdiapo = $lastchange->page ?: 1;
 
 // Recuperer, dans le dossier qui contient toutes les images de slides, les slides avec le nom qui correspond au cours.
 $parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id, 'sesskey' => sesskey());
@@ -112,7 +99,7 @@ print('
 
   <a href="' . $url . '" target="_blank">Ouvrir la fenêtre des diapositives</a>
   <br />
-  <a href="' . $CFG->wwwroot . '/course/view.php?id=' . $courseId . '">Retour</a>
+  <a href="' . $CFG->wwwroot . '/course/view.php?id=' . $courseid . '">Retour</a>
 
   <!-- La progressbar etait un element d UI de la premiere version -->
   <div id="progressbar" class="invisible"></div>
@@ -123,7 +110,7 @@ print('
     <div class="zone_tiers">
       <div id="webcam_view">
         <iframe width="320" height="280"
-          src="'.$adresseStream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0"
+          src="'.$urlstream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0"
           frameborder="0" allowfullscreen>
         </iframe>
       </div>
@@ -206,7 +193,7 @@ print('
     var offset;
 
     // On retrouve le numero de la diapo affichee a cet instant
-    var diapoCourante = '.$nbDiapo.' ;
+    var diapoCourante = '.$nbdiapo.' ;
 
     // Variables de connexion au websocket
     var wsUri = "ws://la-pastel.univ-lemans.fr:8000/";
@@ -302,7 +289,7 @@ print('
   function onOpen(evt)
   {
     writeToScreen("(connecté au système)");
-    authentifie(5, "enseignant", '.$courseId.', '.$cm->id.');
+    authentifie(5, "enseignant", '.$courseid.', '.$cm->id.');
   }
 
   // A la fermeture du canal

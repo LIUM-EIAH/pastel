@@ -261,7 +261,7 @@ class mod_pastel_server implements MessageComponentInterface {
      */
     private function chgtpage(ConnectionInterface $conn, $params) {
         // The page number of the message is the current page number.
-        if (mod_pastel_chgtPage ( $this->userid, $params) == false) {
+        if (mod_pastel_chgtpage ( $this->userid, $params) == false) {
             return;
         }
 
@@ -272,7 +272,7 @@ class mod_pastel_server implements MessageComponentInterface {
         if ($params->navigation == 'backward') {
             $numero = $numero - 1;
         }
-        $maxpage = mod_pastel_get_maxPage($params);
+        $maxpage = mod_pastel_get_maxpage($params);
         if ($maxpage < $numero || $numero < 0) {
             $response = array (
                     'action' => 'error',
@@ -297,7 +297,7 @@ class mod_pastel_server implements MessageComponentInterface {
      */
     private function notifyalerte($params) {
         // Database record in the table  table pastel_user_event.
-        if (mod_pastel_userEvent($this->userid, $params) == false) {
+        if (mod_pastel_userevent($this->userid, $params) == false) {
             return;
         }
         $params->user_id = $this->userid;
@@ -333,7 +333,7 @@ class mod_pastel_server implements MessageComponentInterface {
      *          - the data received from the client.
      */
     private function addressource($params) {
-        if (mod_pastel_addRessource ( $this->userid, $params) == false) {
+        if (mod_pastel_addressource ( $this->userid, $params) == false) {
             return;
         }
 
