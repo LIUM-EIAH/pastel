@@ -25,109 +25,77 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-// Des importantions et variables globales requises par moodle
+// Des importantions et variables globales requises par moodle.
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 require_once(__DIR__.'/tool_demo/output/index_page.php');
 global $DB, $CFG, $COURSE;
 
-// Configure les numeros de cours, de plugins, etc. d'apres les arguments passes en URL
+// Configure les numeros de cours, de plugins, etc. d'apres les arguments passes en URL.
 $instanceId = optional_param('instanceid', 0, PARAM_INT);
-$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID.
+$n  = optional_param('n', 0, PARAM_INT);  // Pastel instance ID.
 $courseId = optional_param('courseid', 0, PARAM_INT);
-$n  = optional_param('n', 0, PARAM_INT);  // ... pastel instance ID - it should be named as the first character of the module.
 
-// Gestion des erreurs dans les arguments
+// Gestion des erreurs dans les arguments.
 if ($id) {
-  $cm         = get_coursemodule_from_id('pastel', $id, 0, false, MUST_EXIST);
-  $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-  $pastel  = $DB->get_record('pastel', array('id' => $cm->instance), '*', MUST_EXIST);
+    $cm         = get_coursemodule_from_id('pastel', $id, 0, false, MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $pastel  = $DB->get_record('pastel', array('id' => $cm->instance), '*', MUST_EXIST);
 } else if ($n) {
-  $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
-  $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
-  $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
+    $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
+    $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
+    $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
 }
 
-// Fetch des ressources precedemments envoyees par le role des ressources, avec leurs differentes caracteristiques
-$resource1 = $DB->get_record('pastel_resource', array('id'=>'3'));
-$lien1 = $resource1->url;
-$titre1 = $resource1->title;
-$domaine1 = $resource1->source;
-$description1 = $resource1->description;
-
-$resource2 = $DB->get_record('pastel_resource', array('id'=>'4'));
-$lien2 = $resource2->url;
-$titre2 = $resource2->title;
-$domaine2 = $resource2->source;
-$description2 = $resource2->description;
-
-$resource3 = $DB->get_record('pastel_resource', array('id'=>'5'));
-$lien3 = $resource3->url;
-$titre3 = $resource3->title;
-$domaine3 = $resource3->source;
-$description3 = $resource3->description;
-
-// Parametres du cours permettant de controler les diapos
-$cours = $DB->get_record('pastel', array('id'=>$instanceId));
+// Parametres du cours permettant de controler les diapos.
+$cours = $DB->get_record('pastel', array('id' => $instanceId));
 $totalDiapo = $cours->intro;
 $adresseStream = $cours->stream;
 
-// Fetch les alertes de vitesse deja envoyees
-$indicateurs = $DB->get_records('pastel_user_event', array('course'=>$courseId, 'activity'=>$id, 'nature'=>'vitesse'));
+// Fetch les alertes de vitesse deja envoyees.
+$indicateurs = $DB->get_records('pastel_user_event', array('course' => $courseId, 'activity' => $id, 'nature' => 'vitesse'));
 $relevantTime = time() - 600;
-$indicateurs2 = $DB->get_records_sql('SELECT * FROM {pastel_user_event} WHERE course = '.$courseId.' AND activity = '.$id.' AND object = "speed" AND timecreated >= '.$relevantTime.' GROUP BY user_id');
+$indicateurs2 = $DB->get_records_sql('SELECT * FROM {pastel_user_event} WHERE course = '.$courseId.
+    ' AND activity = '.$id.' AND object = "speed" AND timecreated >= '.$relevantTime.' GROUP BY user_id');
 $compteIndicateurs = count((array)$indicateurs2);
-// La jointure est faite pour pouvoir retrouver l'ID d'un etudiant connecte et pouvoir l'identifier
+// La jointure est faite pour pouvoir retrouver l'ID d'un etudiant connecte et pouvoir l'identifier.
 $usersConnectes = $DB->get_records_sql('SELECT t1.* FROM mdl_pastel_connection t1
-  JOIN (SELECT user_id, MAX(timecreated) timecreated FROM mdl_pastel_connection WHERE timecreated>1510000000 AND role="etudiant" GROUP BY user_id) t2
+  JOIN (SELECT user_id, MAX(timecreated) timecreated FROM mdl_pastel_connection
+  WHERE timecreated>1510000000 AND role="etudiant" GROUP BY user_id) t2
     ON t1.user_id = t2.user_id AND t1.timecreated = t2.timecreated;');
 $compteConnectes = count((array)$usersConnectes);
 
 
-// Fetch le nombre de personnes connectees
-$connectes = $DB->get_records_sql('SELECT * FROM {pastel_connection} WHERE course = '.$courseId.' AND activity = '.$id.' GROUP BY user_id');
+// Fetch le nombre de personnes connectees.
+$connectes = $DB->get_records_sql('SELECT * FROM {pastel_connection} WHERE course = '.$courseId.
+            ' AND activity = '.$id.' GROUP BY user_id');
 $nbConnectes = count((array)$connectes);
+require_login($course, true, $cm);
 
-
-
-// require_login($course, true, $cm);
-
-// $event = \mod_pastel\event\course_module_viewed::create(array(
-//     'objectid' => $PAGE->cm->instance,
-//     'context' => $PAGE->context,
-// ));
-// $event->add_record_snapshot('course', $PAGE->course);
-// $event->add_record_snapshot($PAGE->cm->modname, $pastel);
-// $event->trigger();
-
-// Print the page header.
-
-
-// Definit le format de la page Moodle, POPUP a ete choisi pour ne pas avoir de marge ou de hearder instrusif
+// Definit le format de la page Moodle, POPUP a ete choisi pour ne pas avoir de marge ou de hearder instrusif.
 $PAGE->set_pagelayout('popup');
 
-// Definit les differentes caracteristiques de la page web
+// Definit les differentes caracteristiques de la page web.
 $PAGE->set_url('/mod/pastel/config1.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($pastel->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->requires->js_call_amd('mod_pastel/pastel_scripts', 'init');
 
 // Output starts here.
-echo $OUTPUT->header(
+echo $OUTPUT->header();
 
-);
-
-// Chercher l'entree BDD concernant le dernier changement de page
-$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.' AND activity='.$id.' ORDER BY id DESC limit 1');
-// Chercher le numero de la derniere diapo affichee (si aucune n'est enregistree on prend le numero 1)
+// Chercher l'entree BDD concernant le dernier changement de page.
+$lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.' AND activity='.$id.
+            ' ORDER BY id DESC limit 1');
+// Chercher le numero de la derniere diapo affichee (si aucune n'est enregistree on prend le numero 1).
 $nbDiapo = $lastChange->page ?: 1;
 
-// Recuperer, dans le dossier qui contient toutes les images de slides, les slides avec le nom qui correspond au cours
-$parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id ,'sesskey' => sesskey());
+// Recuperer, dans le dossier qui contient toutes les images de slides, les slides avec le nom qui correspond au cours.
+$parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id, 'sesskey' => sesskey());
 $url = new moodle_url('/mod/pastel/slides_window.php', $parameters);
 
-// La page web et le JS
+// La page web et le JS.
 print('
   <script src="ckeditor/ckeditor.js"></script>
   <script>
@@ -154,12 +122,12 @@ print('
   <div class="clearfix">
     <div class="zone_tiers">
       <div id="webcam_view">
-        <iframe width="320" height="280" 
-          src="'.$adresseStream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0" 
+        <iframe width="320" height="280"
+          src="'.$adresseStream.'?autoplay=1&modestbranding=1&controls=0&rel=0&showinfo=0"
           frameborder="0" allowfullscreen>
         </iframe>
       </div>
-      
+
      <!-- Cadre avec les resultats des QCMs -->
   <div class="hidden">
     <h4>Réponses aux questions</h4>
@@ -185,34 +153,9 @@ print('
 
     </div>
 
-    
-
     <div class="zone_tiers tscrpt">
-
-
       <div class="apercu_ressources">
-
       </div>
-      <!-- La table d affichage des ressources. Certains enseignants n en veulent pas, elle est mise en commentaire dans cette version
-      <table border=1 style="width:100%">
-        <tr>
-          <td><a id="url1" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-          <td><a id="url5" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-        </tr>
-        <tr>
-          <td><a id="url2" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-          <td><a id="url6" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-        </tr>
-        <tr>
-          <td><a id="url3" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-          <td><a id="url7" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-        </tr>
-        <tr>
-          <td><a id="url4" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-          <td><a id="url8" class="nom_ressource" target="_blank" href="https://fr.wikipedia.org/wiki/Traduction_automatique#Le_processus_de_traduction" style="font-weight: bold;margin-left:10px"> </a></td>
-        </tr>
-      </table>
-      -->
 
       <br />
       <hr />
@@ -237,7 +180,7 @@ print('
           <th>Étudiants</th>
         </tr>
         <tr>
-          <td id="diff1"> </td>  <!-- Le numero de la diapositive liee a l alerte --> 
+          <td id="diff1"> </td>  <!-- Le numero de la diapositive liee a l alerte -->
           <td id="nb1"> </td>   <!-- Le nombre d etudiants qui l ont envoyee -->
         </tr>
       </table>
@@ -253,10 +196,9 @@ print('
   </div>
 
   <div id="info"> </div>
-  
     <script>
-    //___________________________________________LE JAVASCRIPT__________________________________________________________________
-    
+    //___________________________________________LE JAVASCRIPT________________________________________________________________
+
     // Les variables qui servaient a la frise chronologique
     var surFrise = false;
     var xFrise ;
@@ -286,7 +228,6 @@ print('
     var stockDifficulte=[];
     var tempsDifficulte=[];
 
-    //
     var stockTemps = [] ;
     // Stockage des notes pour les envoyer au server et les retrieve
     var stockNotes = [""] ;
@@ -342,12 +283,7 @@ print('
 
       document.getElementById("progressbar").addEventListener("click", function() {
         $("#progressbar").progressbar("value", pourcentage);
-        // $("#transcription").scrollTo(String(pourcentage).concat("%"));
       });
-
-      // document.getElementById("transcription").addEventListener("scroll", function() {
-      //   $("#progressbar").progressbar("value", Math.round(100*$("#transcription").scrollTop() / (document.getElementById("transcription").scrollHeight - $("#transcription").height())));
-      // });
 
     } else {
       console.log( "Barre non detectee" );
@@ -380,7 +316,7 @@ print('
   {
     var message = JSON.parse(evt.data);
     switch (message.action) {
-      case "transcription" : 
+      case "transcription" :
       transcription(message.params);
       break;
       case "page" :
@@ -401,7 +337,6 @@ print('
   // AFFICHER LE NUMERO DE PAGE
   function page(message) {
     // output = document.getElementById("page");
-    
     // var pre = document.createElement("p");
     // pre.style.wordWrap = "break-word";
     // pre.innerHTML = message.page;
@@ -493,7 +428,6 @@ print('
         }
       }
     }
-
   }
 
   // Cette fonction est baptisee podium car elle fait un top 3 des diapositives les moins comprises
@@ -556,7 +490,14 @@ print('
   function notifierAlerte(conteneur, obj, donnee) {
     var data = {
       "action" : "alerte",
-      "params" : { "user_id" : user_id, "container" : conteneur, "object":obj, "activity":activity_id, "course" : course_id, "data" : donnee }
+      "params" : {
+        "user_id" : user_id,
+        "container" : conteneur,
+        "object":obj,
+        "activity":activity_id,
+        "course" : course_id,
+        "data" : donnee
+        }
     };
 
     doSend(JSON.stringify(data));
@@ -589,11 +530,12 @@ print('
     // Auparavant les ressources etaient redirigees vers des emplacements precis dans l interface, cela a ete repense
     // Aujourd hui on ajoute juste le lien qui mene vers cette ressource dans la liste prevue a cet effet
     if(message.mime == "ressources_externes") {
-      $( ".apercu_ressources" ).append( \'<a class="nom_ressource" target="_blank" href="\' + message.source + \'" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",1,"")>\' + message.title + \'</a><br /> \' );
+      $( ".apercu_ressources" ).append( \'<a class="nom_ressource" target="_blank" href="\' + message.source + \'"
+      style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",1,"")>\' + message.title
+      + \'</a><br /> \' );
       $(".apercu_ressources").scrollTo("100%");
     }
   }
-
 
   // Fonction qui enleve les alertes vitesse qui datent de plus de 10 minutes et update la barre
   // + Qui indique combien d\etudiants sont a un point anterieur du cours
@@ -602,7 +544,7 @@ print('
   setInterval(function(){
     var index = tableauVitesse.length - 1 ;
     while (index >= 0) { // Dans cette boucle on parcourt le tableau en partant de la fin
-      if ( (Date.now()/1000 - 600) > tableauVitesse[index]["timecreated"] ){ // On check si les alertes datent d il y a plus de 10 min
+      if ( (Date.now()/1000 - 600) > tableauVitesse[index]["timecreated"] ){ // On check si les alertes datent de plus de 10 min
         tableauVitesse.splice(index, 1); // Si c est le cas on les supprime
       }
       index -= 1 ;
@@ -616,9 +558,9 @@ print('
       $("#barreVitesse").css( "background-color", "red" );
     }
 
-    $("#chiffreAnterieur").text(tableauDirect.length); // On update le texte...
-    var ratioDirect = tableauDirect.length/nombreEtudiants *100; // ...et la jauge des etudiants qui consultent un point anterieur du cours
-    $("#barreDirect").width( ratioDirect + "%"); 
+    $("#chiffreAnterieur").text(tableauDirect.length); // On update le texte et la jauge des etudiants qui...
+    var ratioDirect = tableauDirect.length/nombreEtudiants *100; // ... consultent un point anterieur du cours
+    $("#barreDirect").width( ratioDirect + "%");
 
     $("#repA").text(votesA); // On update le texte...
     $("#gaugeA").width( votesA/nombreEtudiants *100 + "%"); // ...et la jauge des etudiants qui ont repondu A au questionnaire
@@ -629,7 +571,7 @@ print('
 
   }, 3000);
 
-  // Remettre les alertes de difficulte a zero une fois plusieurs minutes passees - le delai est calcule en millisecondes ici 1800000
+  // Remettre les alertes de difficulte a 0 une fois plusieurs minutes passees - le delai est calcule en millisecondes ici 1800000
   setInterval(function(){
     var tableauDifficulte = [];
     var stockDifficulte= [];

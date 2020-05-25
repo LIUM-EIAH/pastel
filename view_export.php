@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * 
+ * Generate the export file and start the transfer.
  * @package    mod_pastel
- * @copyright  2016 Your Name <your@email.address>
+ * @copyright  2020 LIUM
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -25,7 +25,7 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
-require_once 'pastel_export_pdf.php';
+require_once('pastel_export_pdf.php');
 global $USER;
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or

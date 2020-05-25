@@ -20,9 +20,11 @@
  * @see uninstall_plugin()
  *
  * @package    mod_pastel
- * @copyright  2016 Your Name <your@email.address>
+ * @copyright  2020 LIUM
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Custom uninstallation procedure
