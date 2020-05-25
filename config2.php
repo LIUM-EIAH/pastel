@@ -47,8 +47,6 @@ if ($id) {
   $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
   $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
   $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
-// } else {
-//     error('You must specify a course_module ID or an instance ID');
 }
 
 // Fetch des ressources precedemments envoyees par le role des ressources, avec leurs differentes caracteristiques
@@ -71,7 +69,6 @@ $domaine3 = $resource3->source;
 $description3 = $resource3->description;
 
 // Parametres du cours permettant de controler les diapos
-//$cours = $DB->get_record('pastel', array('id'=>'4')); // Le cours selectionne est le cours numero 4, il faut remettre ca en souple
 $cours = $DB->get_record('pastel', array('id'=>$instanceId));
 $totalDiapo = $cours->intro;
 $adresseStream = $cours->stream;
@@ -116,26 +113,10 @@ $PAGE->set_title(format_string($pastel->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->requires->js_call_amd('mod_pastel/pastel_scripts', 'init');
 
-
-/*
- * Other things you may want to set - remove if not needed.
- * $PAGE->set_cacheable(false);
- * $PAGE->set_focuscontrol('some-html-id');
- * $PAGE->add_body_class('pastel-'.$somevar);
- */
-
 // Output starts here.
 echo $OUTPUT->header(
 
 );
-
-// Conditions to show the intro can change to look for own settings or whatever.
-// if ($pastel->intro) {
-//   echo $OUTPUT->box(format_module_intro('pastel', $pastel, $cm->id), 'generalbox mod_introbox', 'pastelintro');
-// }
-
-// Replace the following lines with you own code.
-// echo $OUTPUT->heading('Test de heading');
 
 // Chercher l'entree BDD concernant le dernier changement de page
 $lastChange = $DB->get_record_sql('SELECT * FROM mdl_pastel_slide WHERE course='.$courseId.' AND activity='.$id.' ORDER BY id DESC limit 1');
@@ -145,12 +126,6 @@ $nbDiapo = $lastChange->page ?: 1;
 // Recuperer, dans le dossier qui contient toutes les images de slides, les slides avec le nom qui correspond au cours
 $parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id ,'sesskey' => sesskey());
 $url = new moodle_url('/mod/pastel/slides_window.php', $parameters);
-
-// $parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id ,'sesskey' => sesskey());
-// $url2 = new moodle_url('/mod/pastel/config2-demo.php', $parameters);
-// $label = get_string('demo', 'block_showcase');
-// $options = array('class' => 'overviewButton');
-// echo $OUTPUT->single_button($url2, 'Démo', 'get', $options);
 
 // La page web et le JS
 print('
@@ -381,14 +356,11 @@ print('
 
   //______________________________________CODE DE LA CONNEXION WEBSOCKET__________________________________________________
 
-  //   function testWebSocket()
-  // {
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) { onOpen(evt) };
     websocket.onclose = function(evt) { onClose(evt) };
     websocket.onmessage = function(evt) { onMessage(evt) };
     websocket.onerror = function(evt) { onError(evt) };
-  // }
 
     // Si le socket est ouvert avec succes
   function onOpen(evt)
@@ -447,12 +419,6 @@ print('
 
   // Reception d un message d alerte de la part des etudiants
   function indicator(message) {
-    // output = document.getElementById("info");  
-    // var pre = document.createElement("p");
-    // pre.style.wordWrap = "break-word";
-    // pre.innerHTML = message;
-    // output.appendChild(pre);
-
     // Si c est une alerte qui dit que le cours va trop vite
     if (message["object"]=="speed") {
       // On verifie que la personne qui l envoie n est pas deja dans la liste des alertes recues, pour eviter les doublons
@@ -598,19 +564,19 @@ print('
 
   // Notifie le serveur quand l enseignant revient sur une diapositive precedente, avec son numero de diapositive
   function pageArriere(){
-  	if (diapoCourante>=2){
-	  	var data = {
-	      "action" : "page",
-	      "params" : { "activity":activity_id, "course" : course_id, "navigation" : "backward", "page" : diapoCourante }
-	    };
+    if (diapoCourante>=2){
+        var data = {
+          "action" : "page",
+          "params" : { "activity":activity_id, "course" : course_id, "navigation" : "backward", "page" : diapoCourante }
+        };
 
-	    doSend(JSON.stringify(data));
-	}
+        doSend(JSON.stringify(data));
+    }
   }
 
   // Notifie le serveur quand l enseignant passe a une diapositive suivante, avec son numero de diapositive
   function pageAvant(){
-  	var data = {
+    var data = {
       "action" : "page",
       "params" : { "activity":activity_id, "course" : course_id, "navigation" : "forward", "page" : diapoCourante }
     };
@@ -621,42 +587,6 @@ print('
   function ressource(message) {
     console.log(message);
     // Auparavant les ressources etaient redirigees vers des emplacements precis dans l interface, cela a ete repense
-    // writeToScreen(\'<span>RESSOURCE reçue </span> \' + JSON.stringify(message, null, 4));
-    // if (message["mime"]=="manuel"){
-    //   stockRessource.push(message);
-    //   stockRessource.splice(0,1);
-
-    //   console.log(stockRessource);
-
-    //   $("#url5").attr("href", stockRessource[0]["url"]);
-    //   $("#url5").html(stockRessource[0]["title"]);
-
-    //   $("#url4").attr("href", stockRessource[1]["url"]);
-    //   $("#url4").html(stockRessource[1]["title"]);
-
-    //   $("#url3").attr("href", stockRessource[2]["url"]);
-    //   $("#url3").html(stockRessource[2]["title"]);
-
-    //   $("#url2").attr("href", stockRessource[3]["url"]);
-    //   $("#url2").html(stockRessource[3]["title"]);
-
-    //   $("#url1").attr("href", stockRessource[4]["url"]);
-    //   $("#url1").html(stockRessource[4]["title"]);
-    // }
-
-    // if (message["mime"]=="auto"){
-    //   stockQuestions.push(message);
-    //   stockQuestions.splice(0,1);
-
-    //   $("#url8").attr("href", stockQuestions[0]["url"]);
-    //   $("#url8").html(stockQuestions[0]["title"]);
-
-    //   $("#url7").attr("href", stockQuestions[1]["url"]);
-    //   $("#url7").html(stockQuestions[1]["title"]);
-
-    //   $("#url6").attr("href", stockQuestions[2]["url"]);
-    //   $("#url6").html(stockQuestions[2]["title"]);
-    // }
     // Aujourd hui on ajoute juste le lien qui mene vers cette ressource dans la liste prevue a cet effet
     if(message.mime == "ressources_externes") {
       $( ".apercu_ressources" ).append( \'<a class="nom_ressource" target="_blank" href="\' + message.source + \'" style="font-weight: bold;margin-left:10px" onclick="notifierAlerte("ressource","lien",1,"")>\' + message.title + \'</a><br /> \' );
@@ -715,8 +645,6 @@ print('
   }
 
   </script>
-
-
 
   ');
 

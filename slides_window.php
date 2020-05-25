@@ -48,8 +48,6 @@ if ($id) {
   $pastel  = $DB->get_record('pastel', array('id' => $n), '*', MUST_EXIST);
   $course     = $DB->get_record('course', array('id' => $pastel->course), '*', MUST_EXIST);
   $cm         = get_coursemodule_from_instance('pastel', $pastel->id, $course->id, false, MUST_EXIST);
-// } else {
-//     error('You must specify a course_module ID or an instance ID');
 }
 
 // require_login($course, true, $cm);
@@ -78,25 +76,10 @@ $url_subname = $cours->nomdiapo;
 // SLIDES-CM-2017
 $url_diapo = "http://la-pastel.univ-lemans.fr/mod/pastel_/pix/page/".$url_subname."-page-";
 
-/*
- * Other things you may want to set - remove if not needed.
- * $PAGE->set_cacheable(false);
- * $PAGE->set_focuscontrol('some-html-id');
- * $PAGE->add_body_class('pastel-'.$somevar);
- */
-
 // Output starts here.
 echo $OUTPUT->header(
 
 );
-
-// Conditions to show the intro can change to look for own settings or whatever.
-// if ($pastel->intro) {
-//   echo $OUTPUT->box(format_module_intro('pastel', $pastel, $cm->id), 'generalbox mod_introbox', 'pastelintro');
-// }
-
-// Replace the following lines with you own code.
-// echo $OUTPUT->heading('Test de heading');
 
 print('
   <script src="ckeditor/ckeditor.js"></script>
@@ -166,10 +149,10 @@ print('
     $(document).keydown(function(event){
       console.log(event.keyCode);
       if (event.keyCode == 39 || event.keyCode == 34){
-      	event.preventDefault();
+        event.preventDefault();
         nextSlide();
       } else if (event.keyCode == 37 || event.keyCode == 33) {
-      	event.preventDefault();
+        event.preventDefault();
         previousSlide();
       }
     });
@@ -188,8 +171,6 @@ print('
     document.getElementById("slides_next").addEventListener("click", function() {
         nextSlide();
     });
-
-
 
     //_____________________________________________________________________________________________________________
 
@@ -234,16 +215,6 @@ print('
       break;
     }
   }
-
-  // AFFICHER LE NUMERO DE PAGE
-  // function page(message) {
-  //   output = document.getElementById("page");
-    
-  //   var pre = document.createElement("p");
-  //   pre.style.wordWrap = "break-word";
-  //   pre.innerHTML = message.page;
-  //   output.appendChild(pre);
-  // }
 
   function ressource(message) {
     output = document.getElementById("ressource");

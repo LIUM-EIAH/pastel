@@ -75,28 +75,9 @@ $PAGE->set_url('/mod/pastel/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($pastel->name));
 $PAGE->set_heading(format_string($course->fullname));
 
-/*
- * Other things you may want to set - remove if not needed.
- * $PAGE->set_cacheable(false);
- * $PAGE->set_focuscontrol('some-html-id');
- * $PAGE->add_body_class('pastel-'.$somevar);
- */
 
 // Output starts here.
 echo $OUTPUT->header();
-
-// Conditions to show the intro can change to look for own settings or whatever.
-// if ($pastel->intro) {
-//     echo $OUTPUT->box(format_module_intro('pastel', $pastel, $cm->id), 'generalbox mod_introbox', 'pastelintro');
-// }
-
-// Replace the following lines with you own code.
-//echo $OUTPUT->heading('Test de titre');
-
-// $renderable = new \tool_demo\output\index_page('
-// test de corps de texte
-// ');
-// echo $OUTPUT->render($renderable);
 
 print('Rôle détecté : ');
 
@@ -105,12 +86,12 @@ print_r($rolestr);
 $parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id ,'sesskey' => sesskey());
 
 if (stripos($rolestr, "editingteacher") !== false ) {
-	$url_ens = new moodle_url('/mod/pastel/config2.php', $parameters);
-	redirect($url_ens);
+    $url_ens = new moodle_url('/mod/pastel/config2.php', $parameters);
+    redirect($url_ens);
 
 } else if (stripos($rolestr, "student") !== false ) {
-	$url_etu = new moodle_url('/mod/pastel/v3_etudiant_diapo.php', $parameters);
-	redirect($url_etu);
+    $url_etu = new moodle_url('/mod/pastel/v3_etudiant_diapo.php', $parameters);
+    redirect($url_etu);
 }
 
 $parameters = array('instanceid' => $cm->instance, 'courseid' => $cm->course, 'id' => $cm->id ,'sesskey' => sesskey());
